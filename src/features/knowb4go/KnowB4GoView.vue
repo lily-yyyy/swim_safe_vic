@@ -1,10 +1,15 @@
-<!-- src/features/knowb4go/KnowB4GoView.vue -->
 <template>
-  <div class="container mt-5">
-    <h1 class="text-center">Hello from KnowB4Go Screen </h1>
-  </div>
+  <main class="view-wrapper d-flex justify-content-center align-items-center bg-dark text-white">
+    <h1 class="display-4">Hello from KnowB4Go Screen 🧠</h1>
+  </main>
 </template>
 
 <script setup>
-// Placeholder screen for KnowB4Go
+// No logic needed
 </script>
+
+<style scoped>
+.view-wrapper {
+  width: 100%;
+}
+</style>

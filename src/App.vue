@@ -1,8 +1,22 @@
-<!-- src/App.vue -->
 <template>
+  <NavBar />
   <router-view />
 </template>
 
 <script setup>
-// No logic needed here; just render the routed views
+import NavBar from '@/components/ui/NavBar.vue'
 </script>
+
+<style>
+/* Global padding to avoid content under fixed navbar */
+body, html, #app {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+main.view-wrapper {
+  min-height: 100vh;
+  padding-top: 70px; /* fixed-top navbar offset */
+}
+</style>

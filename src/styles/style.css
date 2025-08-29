@@ -1,0 +1,6 @@
+.fullscreen-view {
+  width: 100vw;
+  height: 100vh;
+  padding-top: 70px; /* To avoid overlap with fixed-top navbar */
+  box-sizing: border-box;
+}

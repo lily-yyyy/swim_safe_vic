@@ -1,29 +1,61 @@
 <script setup>
-import { GoogleMap } from 'vue3-google-map'
+import { ref, onMounted } from "vue"
+import { GoogleMap } from "vue3-google-map"
 
-const apiKey = 'YOUR_API_KEY_HERE' // Replace with your working API key
-const center = { lat: -37.8136, lng: 144.9631 } // Melbourne
+const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
+const mapId = import.meta.env.VITE_GOOGLE_MAP_ID
+
+const center = ref({ lat: -38.0, lng: 145.0 })
+let autocomplete
+
+const searchInput = ref(null)
+
+onMounted(() => {
+  if (window.google && searchInput.value) {
+    autocomplete = new window.google.maps.places.Autocomplete(searchInput.value, {
+      fields: ["geometry", "name"],
+    })
+    autocomplete.addListener("place_changed", () => {
+      const place = autocomplete.getPlace()
+      if (place.geometry && place.geometry.location) {
+        center.value = {
+          lat: place.geometry.location.lat(),
+          lng: place.geometry.location.lng(),
+        }
+      }
+    })
+  }
+})
 </script>
 
 <template>
-  <div class="map-wrapper">
+  <section style="margin-top:16px">
+
+    <!-- Search Bar -->
+    <div>
+      <input
+        ref="searchInput"
+        type="text"
+        class="form-control"
+        placeholder="Search for a location..."
+      />
+    </div>
+
+    <!-- Google Map -->
     <GoogleMap
       :api-key="apiKey"
-      style="width: 100%; height: 100%"
+      :map-id="mapId"
+      :libraries="['places']"
+      version="weekly"
+      style="width: 100%; height: 700px"
       :center="center"
-      :zoom="12"
+      :zoom="15"
     />
-  </div>
+  </section>
 </template>
 
 <style scoped>
-.map-wrapper {
-  position: absolute;
-  top: 70px; /* Leave space for the fixed navbar */
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: calc(100vh - 70px); /* Adjust height relative to navbar */
-  z-index: 0;
+.container {
+  max-width: 600px;
 }
 </style>

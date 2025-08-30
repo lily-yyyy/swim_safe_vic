@@ -23,7 +23,7 @@
 
 <style scoped>
 .navbar {
-  z-index: 9999;
+  z-index: 99999;
 }
 
 .nav-link {

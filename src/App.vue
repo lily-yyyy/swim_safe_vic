@@ -19,4 +19,13 @@ main.view-wrapper {
   min-height: 100vh;
   padding-top: 70px; /* fixed-top navbar offset */
 }
+nav.navbar {
+  z-index: 9999 !important;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
 </style>
+

@@ -1,5 +1,6 @@
 <script setup>
 import bgImage from '@/assets/images/bg.png'
+import BaseButton from '@/components/ui/BaseButton.vue'
 </script>
 
 <template>
@@ -11,12 +12,18 @@ import bgImage from '@/assets/images/bg.png'
       <div class="container text-center py-5">
         <h1 class="display-4 fw-bold">Safer water choices, wherever you go</h1>
         <p class="lead mt-2">Tap, fountain, river or beach — one quick check.</p>
-        <button class="btn btn-info btn-lg mt-4">Start safety check</button>
 
-        <div class="d-flex justify-content-center gap-3 mt-5 flex-wrap">
-          <router-link to="/swim" class="btn btn-outline-light px-4">Swim</router-link>
-          <router-link to="/knowb4go" class="btn btn-outline-light px-4">KnowB4Go</router-link>
-          <router-link to="/refill" class="btn btn-outline-light px-4">Refill</router-link>
+        <BaseButton
+          label="Start safety check"
+          variant="info"
+          size="lg"
+          class="mt-4"
+        />
+
+        <div class="d-flex justify-content-center gap-4 mt-5 flex-wrap">
+          <BaseButton to="/swim" label="Swim" size="lg" />
+          <BaseButton to="/knowb4go" label="KnowB4Go" size="lg" />
+          <BaseButton to="/refill" label="Refill" size="lg" />
         </div>
       </div>
     </div>
@@ -36,10 +43,5 @@ import bgImage from '@/assets/images/bg.png'
   background-color: rgba(0, 0, 0, 0.6);
   height: 100%;
   width: 100%;
-}
-
-.btn-outline-light {
-  border-radius: 12px;
-  min-width: 120px;
 }
 </style>

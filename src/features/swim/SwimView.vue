@@ -1,7 +1,7 @@
 <script setup>
 import { GoogleMap } from 'vue3-google-map'
 
-const apiKey = 'YOUR_API_KEY_HERE' // Replace with your working API key
+const apiKey = 'AIzaSyBb673RZWciPUL1n8LZyUHKSdLT2iR2KbA' // Replace with your working API key
 const center = { lat: -37.8136, lng: 144.9631 } // Melbourne
 </script>
 

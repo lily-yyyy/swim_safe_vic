@@ -1,8 +1,17 @@
 <template>
   <div class="info-dialog shadow rounded p-4 bg-white">
-    <h5 class="title mb-1">{{ location.name }}</h5>
-    <p class="status text-muted">{{ location.status }}</p>
-    <p class="last-tested text-muted small mb-3">Last Tested: {{ location.lastTested }}</p>
+    <div class="d-flex justify-content-between align-items-start">
+      <div>
+        <h5 class="title mb-1">{{ location.name }}</h5>
+        <p class="status text-muted">{{ location.status }}</p>
+        <p class="last-tested text-muted small mb-2">Last Tested: {{ location.lastTested }}</p>
+      </div>
+      <button class="btn-close" @click="$emit('close')"></button>
+    </div>
+
+    <div class="mb-3 text-primary fw-bold" v-if="location.temperature !== undefined">
+      🌡️ {{ location.temperature }}°C
+    </div>
 
     <hr />
 
@@ -25,17 +34,8 @@
 defineProps({
   location: {
     type: Object,
-    required: true,
-    default: () => ({
-      name: 'Location Name',
-      status: 'Reliable',
-      lastTested: '4 days ago',
-      tipTitle: 'Flush the Fountain',
-      tipDetail: '10–30 seconds before filling your bottle',
-      distance: '0.5 mi',
-      time: '8 min',
-    }),
-  },
+    required: true
+  }
 })
 </script>
 

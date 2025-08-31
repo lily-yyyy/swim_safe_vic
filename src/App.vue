@@ -1,11 +1,26 @@
-<template>
+<!-- <template>
   <NavBar />
   <router-view />
 </template>
 
 <script setup>
 import NavBar from '@/components/ui/NavBar.vue'
+</script> -->
+
+<template>
+  <NavBar @open-planner="showCalendar = true" />
+  <router-view />
+  <CalendarDialog v-if="showCalendar" @close="showCalendar = false" />
+</template>
+
+<script setup>
+import NavBar from '@/components/ui/NavBar.vue'
+import CalendarDialog from '@/components/ui/CalendarDialog.vue'
+import { ref } from 'vue'
+
+const showCalendar = ref(false)
 </script>
+
 
 <style>
 /* Global padding to avoid content under fixed navbar */

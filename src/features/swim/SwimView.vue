@@ -85,7 +85,7 @@ onBeforeUnmount(() => {
 </style>  -->
 
 
-<template>
+<!-- <template>
   <SwimMap @marker-clicked="selectedLocation = $event" />
   <InfoDialog v-if="selectedLocation" :location="selectedLocation" />
 </template>
@@ -97,6 +97,26 @@ import InfoDialog from '@/components/ui/InfoDialog.vue'
 
 const selectedLocation = ref(null)
 </script>
+ -->
 
+<script setup>
+import { ref } from 'vue'
+import SwimMap from './components/SwimMap.vue'
+import InfoDialog from '@/components/ui/InfoDialog.vue'
 
+const selectedLocation = ref(null)
+
+function handleMarkerClicked(location) {
+  selectedLocation.value = location
+}
+
+function closeDialog() {
+  selectedLocation.value = null
+}
+</script>
+
+<template>
+  <SwimMap @marker-clicked="handleMarkerClicked" />
+  <InfoDialog v-if="selectedLocation" :location="selectedLocation" @close="closeDialog" />
+</template>
 

@@ -1,6 +1,7 @@
 <script setup>
 import { ref, watch, onBeforeUnmount, onMounted } from 'vue'
 import { GoogleMap, Marker } from 'vue3-google-map'
+import { getWeatherByCoords } from '@/api/weather'
 
 const emit = defineEmits(['marker-clicked'])
 
@@ -16,7 +17,6 @@ const allLocations = ref([])
 let autocomplete = null
 let placeChangedListener = null
 
-// Fetch location data from public directory
 onMounted(async () => {
   try {
     const res = await fetch('/data/locations.json')
@@ -26,7 +26,6 @@ onMounted(async () => {
     console.error('Error loading location data:', err)
   }
 
-  // Initialize autocomplete
   if (window.google && searchInput.value) {
     autocomplete = new window.google.maps.places.Autocomplete(searchInput.value, {
       fields: ['geometry', 'name'],
@@ -44,21 +43,26 @@ onMounted(async () => {
 })
 
 onBeforeUnmount(() => {
-  try {
-    placeChangedListener?.remove?.()
-  } catch {}
+  try { placeChangedListener?.remove?.() } catch {}
   autocomplete = null
 })
 
-// Emit when a marker is clicked
-function handleMarkerClick(location) {
+// Emit location + weather to parent (SwimView)
+async function handleMarkerClick(location) {
+  const weather = await getWeatherByCoords(location.lat, location.lng)
+
+  if (weather?.main) {
+    location.temperature = weather.main.temp
+  } else {
+    location.temperature = 'N/A'
+  }
+
   emit('marker-clicked', location)
 }
 </script>
 
 <template>
   <div class="swim-map">
-    <!-- Search Input -->
     <input
       ref="searchInput"
       type="text"
@@ -66,7 +70,6 @@ function handleMarkerClick(location) {
       placeholder="Search for a location..."
     />
 
-    <!-- Google Map -->
     <GoogleMap
       ref="mapRef"
       :api-key="apiKey"
@@ -77,7 +80,6 @@ function handleMarkerClick(location) {
       :zoom="14"
       class="google-map"
     >
-      <!-- Render all markers -->
       <Marker
         v-for="(loc, i) in allLocations"
         :key="i"
@@ -99,21 +101,10 @@ function handleMarkerClick(location) {
   overflow: hidden;
   position: relative;
 }
-.google-map {
-  width: 100%;
-  height: 100%;
-}
+.google-map { width: 100%; height: 100%; }
 .search-input {
-  position: absolute;
-  top: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
-  width: 300px;
-  max-width: 80%;
-  padding: 8px 12px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  background: white;
+  position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+  z-index: 10; width: 300px; max-width: 80%;
+  padding: 8px 12px; border-radius: 6px; border: 1px solid #ccc; background: white;
 }
 </style>

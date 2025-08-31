@@ -11,14 +11,18 @@
         <router-link to="/swim" class="nav-link d-inline text-white mx-2">Swim</router-link>
         <router-link to="/refill" class="nav-link d-inline text-white mx-2">Refill</router-link>
         <router-link to="/knowb4go" class="nav-link d-inline text-white mx-2">KnowB4Go</router-link>
-        <button class="btn btn-success ms-3">Login</button>
+
+        <button class="btn btn-outline-warning ms-3" @click="$emit('open-planner')">
+          Planner
+        </button>
       </div>
     </div>
   </nav>
 </template>
 
 <script setup>
-// No script needed
+// Emits an event so parent (App.vue) can handle dialog opening
+defineEmits(['open-planner'])
 </script>
 
 <style scoped>

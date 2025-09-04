@@ -1,9 +1,12 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-transparent fixed-top px-4">
+  <nav
+    class="navbar navbar-expand-lg navbar-dark fixed-top px-4"
+    :class="{ 'bg-overlay': route.path === '/swim', 'bg-transparent': route.path !== '/swim' }"
+  >
     <div class="container-fluid justify-content-between">
       <router-link class="navbar-brand d-flex align-items-center" to="/">
         <img src="@/assets/vue.svg" alt="Logo" width="30" height="30" class="me-2" />
-        <span>Name of App</span>
+        <span>Mermaid</span>
       </router-link>
 
       <div>
@@ -21,8 +24,9 @@
 </template>
 
 <script setup>
-// Emits an event so parent (App.vue) can handle dialog opening
+import { useRoute } from 'vue-router'
 defineEmits(['open-planner'])
+const route = useRoute()
 </script>
 
 <style scoped>
@@ -34,5 +38,16 @@ defineEmits(['open-planner'])
   color: white !important;
   font-weight: 500;
   text-decoration: none;
+}
+
+/* Home / Refill / KnowB4Go */
+.bg-transparent {
+  background-color: transparent !important;
+}
+
+/* Swim page (map) navbar overlay */
+.bg-overlay {
+  background-color: rgba(15, 32, 39, 0.85); 
+  backdrop-filter: blur(8px);
 }
 </style>

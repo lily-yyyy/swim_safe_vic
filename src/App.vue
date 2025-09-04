@@ -1,39 +1,40 @@
-<!-- <template>
-  <NavBar />
-  <router-view />
-</template>
-
 <script setup>
-import NavBar from '@/components/ui/NavBar.vue'
-</script> -->
-
-<template>
-  <NavBar @open-planner="showCalendar = true" />
-  <router-view />
-  <CalendarDialog v-if="showCalendar" @close="showCalendar = false" />
-</template>
-
-<script setup>
-import NavBar from '@/components/ui/NavBar.vue'
-import CalendarDialog from '@/components/ui/CalendarDialog.vue'
 import { ref } from 'vue'
+import CalendarDialog from '@/components/ui/CalendarDialog.vue'
+import NavBar from '@/components/ui/NavBar.vue'
 
+// Controls calendar dialog visibility
 const showCalendar = ref(false)
+
+// Open planner dialog (triggered by NavBar)
+function openCalendar() {
+  showCalendar.value = true
+}
+
+// Close dialog handler (called when child emits 'close')
+function closeCalendar() {
+  showCalendar.value = false
+}
 </script>
 
+<template>
+  <!-- Navbar with planner button -->
+  <NavBar @open-planner="openCalendar" />
 
+  <!-- Route views -->
+  <router-view />
+
+  <!-- Calendar dialog -->
+  <CalendarDialog v-if="showCalendar" @close="closeCalendar" />
+</template>
 <style>
-/* Global padding to avoid content under fixed navbar */
-body, html, #app {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-}
+
 
 main.view-wrapper {
   min-height: 100vh;
-  padding-top: 70px; /* fixed-top navbar offset */
+  padding-top: 70px; /* navbar height */
 }
+
 nav.navbar {
   z-index: 9999 !important;
   position: fixed;
@@ -41,6 +42,4 @@ nav.navbar {
   left: 0;
   right: 0;
 }
-
 </style>
-

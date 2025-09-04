@@ -33,10 +33,18 @@ const filteredResults = computed(() => {
   return allSearchable.value.filter(loc => loc.name.toLowerCase().includes(query))
 })
 
-// Beach status by avg_enterococci
+// ---------- Beach helpers (avg_enterococci) ----------
 function getBeachStatus(enterococci) {
   if (enterococci <= 140) return 'Surveillance'
   if (enterococci <= 280) return 'Alert'
+  return 'Action'
+}
+
+// ---------- River helpers (total_nitrogen_mg_l) ----------
+function getRiverStatus(totalN) {
+  // Green ≤ 0.1 | Orange 0.1–0.75 | Red > 0.75
+  if (totalN <= 0.1) return 'Surveillance'
+  if (totalN <= 0.75) return 'Alert'
   return 'Action'
 }
 
@@ -84,6 +92,7 @@ onMounted(async () => {
     const beaches = await getAllBeaches()
     const rivers = await getAllRivers()
 
+    // Enrich beaches
     allLocations.value = beaches.map(beach => {
       const status = getBeachStatus(beach.avg_enterococci)
       return {
@@ -94,7 +103,17 @@ onMounted(async () => {
       }
     })
 
-    allRivers.value = rivers
+    // Enrich rivers (by total_nitrogen_mg_l)
+    allRivers.value = rivers.map(r => {
+      const totalN = Number(r.total_nitrogen_mg_l ?? NaN)
+      const status = Number.isFinite(totalN) ? getRiverStatus(totalN) : 'Surveillance'
+      return {
+        ...r,
+        status,
+        icon: getStatusColorIcon(status),
+        description: r.description || 'No description available.'
+      }
+    })
   } catch (err) {
     console.error('Error loading map data:', err)
   }
@@ -146,7 +165,7 @@ function getDirectionsToLocation(destination) {
       const request = {
         origin,
         destination: { lat: destination.lat, lng: destination.lon },
-        travelMode: window.google.maps.TravelMode.DRIVING, // change to WALKING/BICYCLING/TRANSIT if needed
+        travelMode: window.google.maps.TravelMode.DRIVING,
         provideRouteAlternatives: true
       }
 
@@ -206,20 +225,20 @@ function getDirectionsToLocation(destination) {
         :key="'beach-' + i"
         :options="{
           position: { lat: loc.lat, lng: loc.lon },
-          title: loc.name,
+          title: `${loc.name} (${loc.status})`,
           icon: { url: loc.icon }
         }"
         @click="handleMarkerClick(loc)"
       />
 
-      <!-- River markers -->
+      <!-- River markers (color-coded by total_nitrogen_mg_l) -->
       <Marker
         v-for="(river, i) in allRivers"
         :key="'river-' + i"
         :options="{
           position: { lat: river.lat, lng: river.lon },
-          title: river.name,
-          icon: { url: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png' }
+          title: `${river.name} (${river.status})`,
+          icon: { url: river.icon }
         }"
         @click="handleMarkerClick(river)"
       />

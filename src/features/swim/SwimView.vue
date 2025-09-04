@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 
-// Import the SwimMap component 
+// Import the SwimMap components
 import SwimMap from './components/SwimMap.vue'
 
 // Import a dialog component 
@@ -24,6 +24,7 @@ function handleMarkerClicked(location) {
  */
 function closeDialog() {
   selectedLocation.value = null
+  //selectedLocation.value = null
 }
 </script>
 

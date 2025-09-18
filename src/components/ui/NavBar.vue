@@ -1,24 +1,58 @@
 <template>
   <nav
-    class="navbar navbar-expand-lg navbar-dark fixed-top px-4"
-    :class="{ 'bg-overlay': route.path === '/swim', 'bg-transparent': route.path !== '/swim' }"
+    class="navbar navbar-expand-lg fixed-top px-4 custom-navbar"
+    :class="{
+      'bg-overlay': route.path === '/swim',
+      'bg-turquoise': route.path !== '/swim'
+    }"
   >
-    <div class="container-fluid justify-content-between">
+    <div class="container-fluid justify-content-between align-items-center">
+      
+      <!-- Left: Logo -->
       <router-link class="navbar-brand d-flex align-items-center" to="/">
         <img src="@/assets/vue.svg" alt="Logo" width="30" height="30" class="me-2" />
-        <span>Mermaid</span>
+        <span class="text-white fw-semibold">Mermaid</span>
       </router-link>
 
-      <div>
-        <router-link to="/" class="nav-link d-inline text-white mx-2">Home</router-link>
-        <router-link to="/swim" class="nav-link d-inline text-white mx-2">Swim</router-link>
-        <router-link to="/refill" class="nav-link d-inline text-white mx-2">Refill</router-link>
-        <router-link to="/knowb4go" class="nav-link d-inline text-white mx-2">KnowB4Go</router-link>
+      <!-- Toggle button (for small screens) -->
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
 
-        <button class="btn btn-outline-warning ms-3" @click="$emit('open-planner')">
-          Planner
-        </button>
+      <!-- Collapsible Nav Links -->
+      <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+        <ul class="navbar-nav gap-lg-5 gap-3 text-center">
+          <li class="nav-item">
+            <router-link class="nav-link text-white" to="/">Home</router-link>
+          </li>
+          <li class="nav-item">
+            <router-link class="nav-link text-white" to="/swim">Water Map</router-link>
+          </li>
+          <li class="nav-item">
+            <router-link class="nav-link text-white" to="/about">About</router-link>
+          </li>
+          <li class="nav-item">
+            <router-link class="nav-link text-white" to="/learn">Learn With Us</router-link>
+          </li>
+        </ul>
       </div>
+
+      <!-- Right: Planner Button (ONLY on /swim page) -->
+      <button
+        v-if="route.path === '/swim'"
+        class="btn btn-outline-warning ms-3 d-none d-lg-block"
+        @click="$emit('open-planner')"
+      >
+        Planner
+      </button>
     </div>
   </nav>
 </template>
@@ -30,24 +64,51 @@ const route = useRoute()
 </script>
 
 <style scoped>
-.navbar {
-  z-index: 99999;
+/* Navbar background styles */
+.bg-overlay {
+  background-color: rgba(15, 32, 39, 0.85);
+  backdrop-filter: blur(8px);
 }
 
+.bg-turquoise {
+  background: linear-gradient(90deg, #5fd5c1 0%, #5ac1b0 100%) !important;
+}
+
+/* General navbar styling */
+.custom-navbar {
+  z-index: 10000;
+  transition: background-color 0.3s ease;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+/* Nav links */
 .nav-link {
-  color: white !important;
   font-weight: 500;
+  font-size: 1rem;
   text-decoration: none;
 }
 
-/* Home / Refill / KnowB4Go */
-.bg-transparent {
-  background-color: transparent !important;
+.nav-link:hover {
+  text-decoration: underline;
 }
 
-/* Swim page (map) navbar overlay */
-.bg-overlay {
-  background-color: rgba(15, 32, 39, 0.85); 
-  backdrop-filter: blur(8px);
+/* Planner button */
+.btn-outline-warning {
+  color: white;
+  border-color: white;
+}
+
+.btn-outline-warning:hover {
+  background-color: white;
+  color: #5ac1b0;
+}
+
+/* Optional: Change toggler icon background color */
+.navbar-toggler {
+  border-color: white;
+}
+.navbar-toggler-icon {
+  filter: brightness(0) invert(1); /* makes icon white */
 }
 </style>

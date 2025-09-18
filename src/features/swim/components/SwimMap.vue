@@ -298,4 +298,5 @@ function getDirectionsToLocation(destination) {
 .search-results li:hover {
   background: #f0f0f0;
 }
+
 </style>

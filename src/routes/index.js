@@ -26,15 +26,15 @@ function loadView(loader, { retries = 2, retryDelay = 400 } = {}) {
 // Lazy-loaded route components
 const Home     = loadView(() => import('@/features/home/HomeView.vue'))
 const Swim     = loadView(() => import('@/features/swim/SwimView.vue'))
-const Refill   = loadView(() => import('@/features/refill/RefillView.vue'))
-const KnowB4Go = loadView(() => import('@/features/knowb4go/KnowB4GoView.vue'))
+const About   = loadView(() => import('@/features/about/AboutView.vue'))
+const Learn = loadView(() => import('@/features/learn/LearnView.vue'))
 
-// Route definitions
+// Route definitions - refil section will be changed to about
 const routes = [
   { path: '/',           name: 'Home',     component: Home,     meta: { title: 'Home' } },
   { path: '/swim',       name: 'Swim',     component: Swim,     meta: { title: 'Swim' } },
-  { path: '/refill',     name: 'Refill',   component: Refill,   meta: { title: 'Refill' } },
-  { path: '/knowb4go',   name: 'KnowB4Go', component: KnowB4Go, meta: { title: 'Know Before You Go' } },
+  { path: '/about',     name: 'About',   component: About,    meta: { title: 'About' } },
+  { path: '/learn',      name: 'Learn',    component: Learn,    meta: { title: 'Learn With Us' } },
 ]
 
 // Create router

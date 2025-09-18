@@ -1,6 +1,6 @@
 <template>
   <main class="view-wrapper d-flex justify-content-center align-items-center bg-dark text-white">
-    <h1 class="display-4">Hello from KnowB4Go Screen 🧠</h1>
+    <h1 class="display-4">Hello from Learn Screen 🧠</h1>
   </main>
 </template>
 

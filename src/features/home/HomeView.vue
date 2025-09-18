@@ -1,55 +1,247 @@
 <script setup>
-// Import background image and reusable button component
-import bgImage from '@/assets/images/bg.png'
+// Use Vue Router for button navigation
+import { useRouter } from 'vue-router'
 import BaseButton from '@/components/ui/BaseButton.vue'
+
+const router = useRouter()
+const goToSwimMap = () => router.push('/swim')
 </script>
 
 <template>
-  <!-- Hero section with background image -->
-  <div
-    class="hero-container text-white"
-    :style="{ backgroundImage: `url(${bgImage})` }"
-  >
-    <!-- Semi-transparent overlay for readability -->
-    <div class="overlay d-flex flex-column justify-content-center h-100">
-      <div class="container text-center py-5">
-        <!-- Headline -->
-        <h1 class="display-4 fw-bold">Safer water choices, wherever you go</h1>
-        <p class="lead mt-2">Tap, fountain, river or beach — one quick check.</p>
+  <div class="container-fluid p-0 home-view">
 
-        <!-- Primary action button (not linked yet) -->
+    <!--  Hero Section -->
+    <section class="hero d-flex align-items-center text-center">
+      <div class="container">
+        <div class="hero-content">
+          <h1 class="display-2 fw-bold text-hero-title">Safe Water</h1>
+          <p class="lead mb-4 text-hero-subtitle">
+            Plan, check, and enjoy the clean water
+          </p>
+        </div>
+
+        <!-- Custom BaseButton -->
         <BaseButton
-          label="Start safety check"
-          variant="info"
-          size="lg"
-          class="mt-4"
+          label="Explore Water Map"
+          variant="primary"
+          size="xl"
+          class="hero-button"
+          @click="goToSwimMap"
         />
+      </div>
+    </section>
 
-        <!-- Navigation buttons -->
-        <div class="d-flex justify-content-center gap-4 mt-5 flex-wrap">
-          <BaseButton to="/swim" label="Swim" size="lg" />
-          <BaseButton to="/knowb4go" label="KnowB4Go" size="lg" />
-          <BaseButton to="/refill" label="Refill" size="lg" />
+    <!--  Did You Know Section -->
+    <section class="py-5 bg-light">
+      <div class="container">
+        <div class="row align-items-center">
+          <!-- Text Block -->
+          <div class="col-md-8">
+            <h2 class="fw-bold mb-3 text-dark">Did you know?</h2>
+            <p class="fs-5 text-secondary">
+              Nearly <strong>one-third</strong> of monitored Australian rivers show algal blooms
+              triggered by excess nitrogen and phosphorus.
+            </p>
+          </div>
+          <!-- Icon -->
+          <div class="col-md-4 text-md-end text-center mt-4 mt-md-0">
+            <img src="@/assets/icons/water-ban.png" alt="No swim icon" class="img-fluid" style="max-width: 120px;" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!--  Warning Section -->
+    <section class="py-5 text-white text-center warning-banner">
+      <div class="container">
+        <h3 class="warning-title mb-1">
+          Swimming without checking water quality could put your family’s health at risk.
+        </h3>
+        <p class="warning-subtitle mt-2">With The Mermaids you can</p>
+      </div>
+    </section>
+
+    <!-- 📚 Feature Cards Section -->
+    <section class="py-5 cards-section">
+  <div class="container">
+    <div class="row g-4">
+      <!-- Card 1 -->
+      <div class="col-md-4">
+        <div class="custom-card text-center">
+          <div class="card-body">
+            <h5 class="card-title fw-bold mb-4">Learn and Protect</h5>
+            <div class="d-grid gap-3">
+              <BaseButton label="Water Metrics" variant="primary" />
+              <BaseButton label="How we measure water quality" variant="primary" />
+              <BaseButton label="How to protect yourself" variant="primary" />
+              <BaseButton label="How does rainfall impact the water" variant="primary" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="col-md-4">
+        <div class="custom-card text-center">
+          <div class="card-body">
+            <h5 class="card-title fw-bold mb-3">Real-Time Swim Safety</h5>
+            <p class="card-text mb-4">
+              Interactive map showing real-time safety indicators for beaches and rivers.
+            </p>
+            <BaseButton label="View Map" variant="primary" @click="goToSwimMap" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="col-md-4">
+        <div class="custom-card text-center">
+          <div class="card-body">
+            <h5 class="card-title fw-bold mb-3">Find Amenities</h5>
+            <p class="card-text mb-4">
+              Locate public toilets and water fountains with recent cleanliness reports.
+            </p>
+            <BaseButton label="View Map" variant="primary" @click="goToSwimMap" />
+          </div>
         </div>
       </div>
     </div>
   </div>
+</section>
+
+  </div>
 </template>
 
 <style scoped>
-/* Hero container takes full viewport */
-.hero-container {
-  height: 100vh;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  position: relative;
+/*  Page Background */
+.home-view {
+  background-color: #FFFFE7;
 }
 
-/* Overlay darkens background for better text contrast */
-.overlay {
-  background-color: rgba(0, 0, 0, 0.6);
+/*  Hero Section */
+.hero {
+  background: url('@/assets/images/hero-background.png') center center/cover no-repeat;
+  height: 100vh;
+  color: #ffffff;
+}
+
+.hero-content {
+  margin-top: -60px; /* Move Safe Water text slightly upward */
+}
+
+.text-hero-title {
+  font-size: 8.5rem;
+  color: #504c4c;
+}
+
+.text-hero-subtitle {
+  color: #504c4c;
+  font-size: 3.3rem;
+}
+
+/*  Hero Button Custom Style */
+.hero-button {
+  font-weight: 600;
+  font-size: 1.1rem;
+  padding: 0.75rem 2.5rem;
+  border-radius: 999px;
+  background-color: hsl(191, 74%, 62%);
+  color: white;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.hero-button:hover {
+  background-color: #1a9fa1;
+  transform: scale(1.05);
+}
+
+/*  Warning Section */
+.warning-banner {
+  background: linear-gradient(90deg, #5fd5c1 0%, #5ac1b0 100%);
+  color: white;
+}
+
+.warning-title {
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.warning-subtitle {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+/*  Light background override */
+.bg-light {
+  background-color: #FFFFE7 !important;
+}
+
+/*  Custom Card Style */
+.cards-section {
+  background-color: #FFFFE7;
+}
+
+.custom-card {
+  background-color: #5fd5c1; /* light aqua */
+  border-radius: 20px;
+  padding: 2rem;
   height: 100%;
-  width: 100%;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+  border: none;
+  transition: transform 0.3s ease;
+}
+
+.custom-card:hover {
+  transform: translateY(-4px);
+}
+
+
+.btn-rounded-outline {
+  background-color: #5fd5c1; /* light aqua */
+  border: 2px solid #264653; /* dark border */
+  color: #264653;
+  border-radius: 999px; /* pill shape */
+  font-weight: 500;
+  padding: 0.5rem 1.5rem;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.btn-rounded-outline:hover {
+  background-color: #a6ecff;
+  border-color: #264653;
+  color: #1b2f38;
+  transform: scale(1.05);
+}
+
+/* 📱 Responsive Adjustments */
+@media (max-width: 768px) {
+  .text-hero-title {
+    font-size: 2.8rem;
+  }
+
+  .text-hero-subtitle {
+    font-size: 1.1rem;
+  }
+
+  .hero-button {
+    font-size: 1rem;
+    padding: 0.6rem 2rem;
+  }
+
+  .hero-content {
+    margin-top: -20px;
+  }
+
+  .warning-title {
+    font-size: 1.2rem;
+  }
+
+  .warning-subtitle {
+    font-size: 1.1rem;
+  }
 }
 </style>

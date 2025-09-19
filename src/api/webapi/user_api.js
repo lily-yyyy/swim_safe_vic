@@ -1,4 +1,4 @@
-import http from '@/http' // centralized axios instance
+import http from '@/api/http'
 
 //  GET all users
 export async function getUsers() {

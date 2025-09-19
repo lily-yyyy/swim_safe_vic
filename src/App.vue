@@ -1,35 +1,43 @@
+<!-- src/App.vue -->
 <script setup>
 import { ref } from 'vue'
-import CalendarDialog from '@/components/ui/CalendarDialog.vue'
 import NavBar from '@/components/ui/NavBar.vue'
+import Planner from '@/features/home/components/Planer.vue'
 
-// Controls calendar dialog visibility
+// Controls planner dialog visibility
 const showCalendar = ref(false)
 
-// Open planner dialog (triggered by NavBar)
+// Forces re-render to reset state
+const plannerKey = ref(0)
+
+// Called when "Planner" button is clicked
 function openCalendar() {
   showCalendar.value = true
+  plannerKey.value++ // 🔁 Force remount
 }
 
-// Close dialog handler (called when child emits 'close')
+// Called when Planner emits "close"
 function closeCalendar() {
   showCalendar.value = false
 }
 </script>
 
 <template>
-  <!-- Navbar with planner button -->
+  <!-- Navbar -->
   <NavBar @open-planner="openCalendar" />
 
-  <!-- Route views -->
+  <!-- Router View -->
   <router-view />
 
-  <!-- Calendar dialog -->
-  <CalendarDialog v-if="showCalendar" @close="closeCalendar" />
+  <!-- Planner Dialog (only one!) -->
+  <Planner
+    v-if="showCalendar"
+    :key="plannerKey"
+    @close="closeCalendar"
+  />
 </template>
+
 <style>
-
-
 main.view-wrapper {
   min-height: 100vh;
   padding-top: 70px; /* navbar height */

@@ -1,16 +1,14 @@
+<!-- src/components/ui/CalendarDialog.vue -->
 <template>
-  <!-- Fullscreen Backdrop -->
   <div class="calendar-dialog-backdrop" @click="handleBackdropClick">
-    
-    <!-- Modal Dialog -->
     <div class="calendar-dialog shadow bg-white rounded" @click.stop>
-      
+
       <!-- Header -->
       <div class="dialog-header d-flex justify-content-between align-items-start">
         <div class="dialog-title">
-          <h5>Plan Your Next Visit to a Beach/River</h5>
+          <h5>Plan Your Visit</h5>
           <p class="text-muted small">
-            Please select one or more dates you'd like to visit. You’ll receive alerts about water quality the day before.
+            Select your preferred date, time and place to get water safety alerts before visiting.
           </p>
         </div>
         <button class="btn-close" @click="$emit('close')" title="Close"></button>
@@ -18,49 +16,62 @@
 
       <!-- Body -->
       <div class="dialog-body">
-        <!-- Date Picker -->
-        <label for="date-picker" class="form-label fw-semibold">Select a date</label>
+        <!-- Date -->
+        <label class="form-label fw-semibold">Date</label>
         <input
-          id="date-picker"
           type="date"
-          class="form-control"
-          v-model="selectedDate"
+          class="form-control mb-3"
+          :value="selectedDate"
           :min="minDate"
-          @change="addDate"
+          @input="$emit('update:date', $event.target.value)"
         />
 
-        <!-- Selected Dates List -->
-        <div v-if="dates.length" class="selected-dates mt-4">
-          <h6 class="fw-semibold">Selected Dates</h6>
-          <ul class="list-group mt-2">
-            <li
-              v-for="(date, index) in dates"
-              :key="index"
-              class="list-group-item d-flex justify-content-between align-items-center"
-            >
-              {{ formatDate(date) }}
-              <button
-                class="btn btn-sm btn-outline-danger"
-                @click="removeDate(index)"
-              >
-                Remove
-              </button>
-            </li>
-          </ul>
-        </div>
+        <!-- Time -->
+        <label class="form-label fw-semibold">Time</label>
+        <input
+          type="time"
+          class="form-control mb-3"
+          :value="selectedTime"
+          @input="$emit('update:time', $event.target.value)"
+        />
 
-        <!-- Empty State -->
-        <div v-else class="mt-4 text-muted small">
-          No dates selected yet.
-        </div>
+        <!-- Place Type -->
+        <label class="form-label fw-semibold">Place Type</label>
+        <select
+          class="form-select mb-3"
+          :value="placeType"
+          @change="$emit('update:place-type', $event.target.value)"
+        >
+          <option disabled value="">Select Type</option>
+          <option value="beach">Beach</option>
+          <option value="river">River</option>
+        </select>
+
+        <!-- Location -->
+        <label class="form-label fw-semibold">Location</label>
+        <select
+          class="form-select mb-3"
+          :value="selectedPlaceId"
+          :disabled="!places.length"
+          @change="$emit('update:place-id', $event.target.value)"
+        >
+          <option disabled value="">Select Location</option>
+          <option
+            v-for="place in places"
+            :key="place.id"
+            :value="place.id"
+          >
+            {{ place.name }}
+          </option>
+        </select>
       </div>
 
       <!-- Footer -->
       <div class="dialog-footer d-flex justify-content-end mt-4">
         <button
           class="btn btn-primary px-4"
-          @click="submitDates"
-          :disabled="!dates.length"
+          :disabled="!isFormValid"
+          @click="$emit('submit')"
         >
           Submit
         </button>
@@ -71,49 +82,38 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed } from 'vue'
 
-// Emits the 'close' event to parent
-const emit = defineEmits(['close'])
+const props = defineProps({
+  selectedDate: String,
+  selectedTime: String,
+  placeType: String,
+  selectedPlaceId: [String, Number],
+  places: {
+    type: Array,
+    default: () => []
+  }
+})
 
-const selectedDate = ref('')
-const dates = ref([])
+const emit = defineEmits([
+  'update:date',
+  'update:time',
+  'update:place-type',
+  'update:place-id',
+  'submit',
+  'close'
+])
 
-// Prevent selecting past dates
+// Don't allow past dates
 const minDate = new Date().toISOString().split('T')[0]
 
-// Add date to list if unique
-function addDate() {
-  const value = selectedDate.value
-  if (value && !dates.value.includes(value)) {
-    dates.value.push(value)
-  }
-  selectedDate.value = ''
-}
+const isFormValid = computed(() =>
+  props.selectedDate &&
+  props.selectedTime &&
+  props.placeType &&
+  props.selectedPlaceId
+)
 
-// Remove a specific date
-function removeDate(index) {
-  dates.value.splice(index, 1)
-}
-
-// Format date for display
-function formatDate(dateStr) {
-  const date = new Date(dateStr)
-  return date.toLocaleDateString(undefined, {
-    weekday: 'short',
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  })
-}
-
-// Submit and close dialog
-function submitDates() {
-  alert('Dates submitted successfully!')
-  emit('close')
-}
-
-// Click outside dialog closes it
 function handleBackdropClick() {
   emit('close')
 }
@@ -136,11 +136,10 @@ function handleBackdropClick() {
   width: 100%;
   max-width: 480px;
   padding: 24px;
-  border: 1px solid #dee2e6;
   border-radius: 12px;
-  max-height: 90vh;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   overflow-y: auto;
-  box-sizing: border-box;
+  max-height: 90vh;
 }
 
 .dialog-header {
@@ -150,24 +149,6 @@ function handleBackdropClick() {
 .dialog-title h5 {
   margin-bottom: 6px;
   font-weight: 600;
-}
-
-.dialog-title p {
-  margin: 0;
-}
-
-input[type='date'] {
-  font-size: 1rem;
-  padding: 10px 12px;
-}
-
-.selected-dates h6 {
-  margin-bottom: 6px;
-}
-
-.list-group-item {
-  font-size: 0.95rem;
-  padding: 10px 12px;
 }
 
 .dialog-footer {

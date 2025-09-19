@@ -1,14 +1,22 @@
 <script setup>
 // Use Vue Router for button navigation
 import { useRouter } from 'vue-router'
-import BaseButton from '@/components/ui/BaseButton.vue'
+import { ref } from 'vue'
 
+import BaseButton from '@/components/ui/BaseButton.vue'
+import Planner from './components/Planer.vue'
+
+const showDialog = ref(false)
 const router = useRouter()
 const goToSwimMap = () => router.push('/swim')
 </script>
 
 <template>
   <div class="container-fluid p-0 home-view">
+<!-- planner code -->
+    <BaseButton label="Planner" @click="showDialog = true" />
+
+    <Planner v-if="showDialog" @close="showDialog = false" />
 
     <!--  Hero Section -->
     <section class="hero d-flex align-items-center text-center">

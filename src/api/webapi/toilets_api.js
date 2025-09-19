@@ -1,4 +1,4 @@
-import http from '@/http'  // use the centralized axios instance
+import http from '@/api/http'
 
 //  Get all toilets
 export async function getToilets() {

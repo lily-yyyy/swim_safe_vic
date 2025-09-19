@@ -45,9 +45,9 @@
         </ul>
       </div>
 
-      <!-- Right: Planner Button (ONLY on /swim page) -->
+      <!-- Right: Planner Button (ONLY on /home page) -->
       <button
-        v-if="route.path === '/swim'"
+        v-if="route.path === '/'"
         class="btn btn-outline-warning ms-3 d-none d-lg-block"
         @click="$emit('open-planner')"
       >

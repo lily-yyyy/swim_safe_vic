@@ -1,3 +1,55 @@
+<!-- src/features/swim/components/FilterSidebar.vue -->
+<script setup>
+import { ref, reactive, watch } from 'vue'
+
+const emit = defineEmits(['update:filters', 'update:search', 'search-selected'])
+
+const props = defineProps({
+  results: {
+    type: Array,
+    default: () => []
+  }
+})
+
+// Filters
+const filters = reactive({
+  showOnMap: 'all',
+  waterQuality: null,
+  distance: null,
+  amenities: [],
+  toiletAccessibility: null,
+})
+
+// Search query
+const searchQuery = ref('')
+
+// 🔁 Emit search input
+watch(searchQuery, () => {
+  emit('update:search', searchQuery.value)
+})
+
+// 🔁 Emit filters when updated
+watch(filters, () => {
+  emit('update:filters', { ...filters })
+}, { deep: true })
+
+function setFilter(group, value) {
+  filters[group] = filters[group] === value ? null : value
+}
+
+function toggleAmenity(value) {
+  const index = filters.amenities.indexOf(value)
+  if (index === -1) filters.amenities.push(value)
+  else filters.amenities.splice(index, 1)
+}
+
+// Select suggestion from dropdown
+function selectSuggestion(item) {
+  emit('search-selected', item)
+  searchQuery.value = item.name
+}
+</script>
+
 <template>
   <div class="filter-sidebar">
     <!-- 🔍 Search with icon -->
@@ -9,6 +61,17 @@
         type="text"
         placeholder="Search beach, river location"
       />
+
+      <!-- 🔽 Search Suggestions -->
+      <ul v-if="searchQuery && props.results.length" class="search-suggestions">
+        <li
+          v-for="(item, index) in props.results"
+          :key="index"
+          @click="selectSuggestion(item)"
+        >
+          {{ item.name }}
+        </li>
+      </ul>
     </div>
 
     <!-- 🎯 Filters -->
@@ -18,27 +81,15 @@
     <section>
       <label>Show on Map</label>
       <div class="btn-group">
-        <button
-          class="btn"
-          :class="{ active: filters.showOnMap === 'all' }"
-          @click="setFilter('showOnMap', 'all')"
-        >
+        <button class="btn" :class="{ active: filters.showOnMap === 'all' }" @click="setFilter('showOnMap', 'all')">
           <img src="@/assets/icons/swim.svg" />
           All Swim
         </button>
-        <button
-          class="btn"
-          :class="{ active: filters.showOnMap === 'river' }"
-          @click="setFilter('showOnMap', 'river')"
-        >
+        <button class="btn" :class="{ active: filters.showOnMap === 'river' }" @click="setFilter('showOnMap', 'river')">
           <img src="@/assets/icons/river.svg" />
           River
         </button>
-        <button
-          class="btn"
-          :class="{ active: filters.showOnMap === 'beach' }"
-          @click="setFilter('showOnMap', 'beach')"
-        >
+        <button class="btn" :class="{ active: filters.showOnMap === 'beach' }" @click="setFilter('showOnMap', 'beach')">
           <img src="@/assets/icons/beach.svg" />
           Beach
         </button>
@@ -65,7 +116,7 @@
       </div>
     </section>
 
-    <!-- Amenities with icons -->
+    <!-- Amenities -->
     <section>
       <label>Amenities</label>
       <div class="btn-group">
@@ -90,63 +141,22 @@
       </div>
     </section>
 
-    <!-- 🧾 Results with icon -->
+    <!-- 🧾 Results section -->
     <section>
       <label>Results</label>
-      <div v-for="(res, i) in results" :key="i" class="result-item">
+      <div v-for="(res, i) in props.results" :key="i" class="result-item">
         <div class="result-header">
           <img src="@/assets/icons/menu.svg" />
           <strong>{{ res.name }}</strong>
         </div>
-        <div :class="['status', res.status.toLowerCase()]">{{ res.status }}</div>
+        <div :class="['status', res.status?.toLowerCase()]">{{ res.status }}</div>
         <p>{{ res.description }}</p>
       </div>
     </section>
   </div>
 </template>
 
-<script setup>
-import { ref, reactive, watch } from 'vue'
-
-const emit = defineEmits(['update:filters'])
-
-const filters = reactive({
-  showOnMap: null,
-  waterQuality: null,
-  distance: null,
-  amenities: [],
-  toiletAccessibility: null
-})
-
-const searchQuery = ref('')
-
-// Dummy results
-const results = ref([
-  { name: 'St Kilda Beach', status: 'Safe', description: 'Recommended for swimming' },
-  { name: 'Albert Park River', status: 'Unsafe', description: 'Not recommended' },
-  { name: 'Port Melbourne Beach', status: 'Caution', description: 'Maybe recommended' }
-])
-
-function setFilter(group, value) {
-  filters[group] = filters[group] === value ? null : value
-}
-
-function toggleAmenity(value) {
-  const index = filters.amenities.indexOf(value)
-  if (index === -1) {
-    filters.amenities.push(value)
-  } else {
-    filters.amenities.splice(index, 1)
-  }
-}
-
-watch(filters, (newFilters) => {
-  emit('update:filters', { ...newFilters })
-}, { deep: true })
-</script>
-
 <style scoped>
-/* Sidebar layout */
 .filter-sidebar {
   display: flex;
   flex-direction: column;
@@ -182,7 +192,7 @@ label {
   display: block;
 }
 
-/* 🔍 Search */
+/* Search */
 .search-container {
   position: relative;
 }
@@ -203,6 +213,31 @@ label {
   width: 16px;
   height: 16px;
   opacity: 0.6;
+}
+
+.search-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: white;
+  border: 1px solid #ccc;
+  width: 100%;
+  z-index: 10;
+  max-height: 200px;
+  overflow-y: auto;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.search-suggestions li {
+  padding: 10px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.search-suggestions li:hover {
+  background: #f0f0f0;
 }
 
 /* Buttons */

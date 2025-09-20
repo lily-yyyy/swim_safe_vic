@@ -18,3 +18,11 @@ export async function createUser(email) {
   return response.data
 }
 
+
+//  Search for a user by email
+export async function searchUserByEmail(email) {
+  const response = await http.get(`/users/search`, {
+    params: { email }
+  })
+  return response.data.data
+}

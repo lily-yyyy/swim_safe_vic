@@ -1,8 +1,7 @@
-<!-- src/components/ui/CalendarDialog.vue -->
 <template>
   <div class="calendar-dialog-backdrop" @click="handleBackdropClick">
     <div class="calendar-dialog shadow bg-white rounded" @click.stop>
-
+      
       <!-- Header -->
       <div class="dialog-header d-flex justify-content-between align-items-start">
         <div class="dialog-title">
@@ -16,6 +15,20 @@
 
       <!-- Body -->
       <div class="dialog-body">
+
+        <!-- Email Input (only for first-time users) -->
+        <div v-if="showEmailInput">
+          <label class="form-label fw-semibold">Email</label>
+          <input
+            type="email"
+            class="form-control mb-3"
+            :value="userEmail"
+            placeholder="Enter your email"
+            @input="$emit('update:email', $event.target.value)"
+            required
+          />
+        </div>
+
         <!-- Date -->
         <label class="form-label fw-semibold">Date</label>
         <input
@@ -56,11 +69,7 @@
           @change="$emit('update:place-id', $event.target.value)"
         >
           <option disabled value="">Select Location</option>
-          <option
-            v-for="place in places"
-            :key="place.id"
-            :value="place.id"
-          >
+          <option v-for="place in places" :key="place.id" :value="place.id">
             {{ place.name }}
           </option>
         </select>
@@ -84,36 +93,56 @@
 <script setup>
 import { computed } from 'vue'
 
+// -------------------
+// Props from parent
+// -------------------
 const props = defineProps({
   selectedDate: String,
   selectedTime: String,
   placeType: String,
   selectedPlaceId: [String, Number],
+  userEmail: String,
   places: {
     type: Array,
     default: () => []
+  },
+  showEmailInput: {
+    type: Boolean,
+    default: true
   }
 })
 
+// Emits back to parent
 const emit = defineEmits([
   'update:date',
   'update:time',
   'update:place-type',
   'update:place-id',
+  'update:email',
   'submit',
   'close'
 ])
 
-// Don't allow past dates
+// ⏰ Minimum selectable date = today
 const minDate = new Date().toISOString().split('T')[0]
 
-const isFormValid = computed(() =>
-  props.selectedDate &&
-  props.selectedTime &&
-  props.placeType &&
-  props.selectedPlaceId
-)
+// ✅ Form validation
+const isFormValid = computed(() => {
+  const hasDate = props.selectedDate
+  const hasTime = props.selectedTime
+  const hasPlace = props.placeType && props.selectedPlaceId
+  const hasEmail = !props.showEmailInput || (props.userEmail && validateEmail(props.userEmail))
 
+  return hasDate && hasTime && hasPlace && hasEmail
+})
+
+// 📧 Email format validator
+function validateEmail(email) {
+  const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  return pattern.test(email)
+}
+
+// ❌ Handle click outside to close
 function handleBackdropClick() {
   emit('close')
 }

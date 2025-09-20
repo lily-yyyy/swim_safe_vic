@@ -1,40 +1,60 @@
 <!-- src/App.vue -->
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import NavBar from '@/components/ui/NavBar.vue'
 import Planner from '@/features/home/components/Planer.vue'
+import PasswordApp from './components/ui/security/PasswordApp.vue'
 
 // Controls planner dialog visibility
 const showCalendar = ref(false)
+const plannerKey = ref(0) // For remounting planner
 
-// Forces re-render to reset state
-const plannerKey = ref(0)
+// Track site access
+const isAuthenticated = ref(false)
 
-// Called when "Planner" button is clicked
-function openCalendar() {
-  showCalendar.value = true
-  plannerKey.value++ // 🔁 Force remount
+// On mount: check if already authenticated
+onMounted(() => {
+  isAuthenticated.value = localStorage.getItem('site_authenticated') === 'true'
+})
+
+// Triggered when password is correct
+function handleAuthSuccess() {
+  isAuthenticated.value = true
 }
 
-// Called when Planner emits "close"
+// Open planner (from NavBar)
+function openCalendar() {
+  showCalendar.value = true
+  plannerKey.value++ // remount planner to reset state
+}
+
+// Close planner (from child)
 function closeCalendar() {
   showCalendar.value = false
 }
 </script>
 
 <template>
-  <!-- Navbar -->
-  <NavBar @open-planner="openCalendar" />
+  <!-- Step 1: Require Password Gate -->
+  <div v-if="!isAuthenticated">
+    <PasswordApp @authenticated="handleAuthSuccess" />
+  </div>
 
-  <!-- Router View -->
-  <router-view />
+  <!-- Step 2: Show app if authenticated -->
+  <div v-else>
+    <!-- Navbar -->
+    <NavBar @open-planner="openCalendar" />
 
-  <!-- Planner Dialog (only one!) -->
-  <Planner
-    v-if="showCalendar"
-    :key="plannerKey"
-    @close="closeCalendar"
-  />
+    <!-- Router View -->
+    <router-view />
+
+    <!-- Planner Dialog -->
+    <Planner
+      v-if="showCalendar"
+      :key="plannerKey"
+      @close="closeCalendar"
+    />
+  </div>
 </template>
 
 <style>

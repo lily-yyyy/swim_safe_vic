@@ -11,7 +11,7 @@
       <!-- Left: Logo -->
       <router-link class="navbar-brand d-flex align-items-center" to="/">
         <img src="@/assets/vue.svg" alt="Logo" width="30" height="30" class="me-2" />
-        <span class="text-white fw-semibold">Mermaid</span>
+        <span class="text-white fw-semibold">The Mermaid</span>
       </router-link>
 
       <!-- Toggle button (for small screens) -->

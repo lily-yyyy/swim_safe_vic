@@ -66,7 +66,7 @@ const route = useRoute()
 <style scoped>
 /* Navbar background styles */
 .bg-overlay {
-  background-color: rgba(15, 32, 39, 0.85);
+  background: linear-gradient(90deg, #5fd5c1 0%, #5ac1b0 100%) !important;
   backdrop-filter: blur(8px);
 }
 

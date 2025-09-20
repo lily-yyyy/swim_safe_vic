@@ -19,10 +19,16 @@ export async function createUser(email) {
 }
 
 
-//  Search for a user by email
 export async function searchUserByEmail(email) {
-  const response = await http.get(`/users/search`, {
-    params: { email }
-  })
-  return response.data.data
+  try {
+    const response = await http.get('/users/search', {
+      params: { email }
+    })
+    return response.data.data
+  } catch (error) {
+    if (error.response?.status === 404) {
+      return null // treat as "user not found"
+    }
+    throw error // rethrow other errors
+  }
 }

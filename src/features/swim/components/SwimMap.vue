@@ -7,11 +7,13 @@ import { GoogleMap, Marker } from 'vue3-google-map'
 import { getWeatherByCoords } from '@/api/weather'
 import { getAllBeaches } from '@/api/webapi/beach_api'
 import { getAllRivers } from '@/api/webapi/river_api'
+import { getToiletById } from '@/api/webapi/toilet_api'
 
 // Components
 import ToiletMarkers from './ToiletMarkers.vue'
 import FountainMarkers from './FountainMarkers.vue'
 
+// Props
 const props = defineProps({
   filters: Object,
   searchQuery: String,
@@ -20,19 +22,22 @@ const props = defineProps({
 
 const emit = defineEmits(['marker-clicked'])
 
+// Google Maps config
 const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
 const mapId = import.meta.env.VITE_GOOGLE_MAP_ID || ''
 
+// Refs
 const center = ref({ lat: -37.8679, lng: 144.9740 }) // Default Melbourne center
 const mapRef = ref(null)
 
 const allBeaches = ref([])
 const allRivers = ref([])
+const userLocation = ref(null)
 
 const directionsService = ref(null)
 let directionsRenderer = null
 
-// 🔁 Setup directions service when map loads
+// Setup directions on map
 watch(
   () => mapRef.value?.map,
   (map) => {
@@ -53,7 +58,64 @@ watch(
   { immediate: true }
 )
 
-// 📍 Zoom when target is selected from sidebar
+// Optional: Pre-fetch user location on load
+onMounted(() => {
+  fetchUserLocation().catch(() => {
+    console.warn('User denied geolocation or it failed.')
+  })
+})
+
+// Fetch user location once & cache
+function fetchUserLocation() {
+  return new Promise((resolve, reject) => {
+    if (userLocation.value) {
+      resolve(userLocation.value)
+      return
+    }
+
+    if (!navigator.geolocation) {
+      reject(new Error('Geolocation not supported'))
+      return
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        userLocation.value = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        }
+        resolve(userLocation.value)
+      },
+      (err) => reject(err)
+    )
+  })
+}
+
+// Get directions to target
+async function getDirectionsToLocation(destination) {
+  try {
+    const origin = await fetchUserLocation()
+
+    const request = {
+      origin,
+      destination: { lat: destination.lat, lng: destination.lon },
+      travelMode: window.google.maps.TravelMode.DRIVING
+    }
+
+    directionsService.value.route(request, (result, status) => {
+      if (status === 'OK') {
+        directionsRenderer.setDirections(result)
+      } else {
+        alert('Failed to get directions.')
+      }
+    })
+  } catch (err) {
+    alert('Unable to access your location')
+    console.error('Directions error:', err)
+  }
+}
+
+// Zoom to selected location
 watch(() => props.zoomTarget, (target) => {
   if (target && mapRef.value?.map) {
     const map = mapRef.value.map
@@ -62,7 +124,7 @@ watch(() => props.zoomTarget, (target) => {
   }
 })
 
-// ⏬ Load all beaches and rivers
+// Load beach & river data
 onMounted(async () => {
   try {
     const beaches = await getAllBeaches()
@@ -95,21 +157,19 @@ onMounted(async () => {
   }
 })
 
-// ✅ Beach Status
+// Status logic
 function getBeachStatus(enterococci) {
   if (enterococci <= 140) return 'Surveillance'
   if (enterococci <= 280) return 'Alert'
   return 'Action'
 }
 
-// ✅ River Status
 function getRiverStatus(totalN) {
   if (totalN <= 0.1) return 'Surveillance'
   if (totalN <= 0.75) return 'Alert'
   return 'Action'
 }
 
-// 🧠 Marker color
 function getStatusColorIcon(status) {
   switch (status) {
     case 'Surveillance': return 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'
@@ -119,7 +179,7 @@ function getStatusColorIcon(status) {
   }
 }
 
-// 🧠 Filtering logic
+// Filter markers
 const filteredLocations = computed(() => {
   const show = props.filters?.showOnMap || 'all'
   const quality = props.filters?.waterQuality
@@ -146,54 +206,34 @@ const filteredLocations = computed(() => {
   return data
 })
 
-// 📍 Marker Click
+// Handle marker click
 async function handleMarkerClick(location) {
   try {
-    const weather = await getWeatherByCoords(location.lat, location.lon)
-    location.temperature = weather?.main?.temp ?? 'N/A'
+    if (location.type === 'toilet') {
+      const data = await getToiletById(location.id)
 
-    emit('marker-clicked', {
-      ...location,
-      getDirections: () => getDirectionsToLocation(location)
-    })
+      emit('marker-clicked', {
+        ...location,
+        ...data,
+        type: 'toilet',
+        getDirections: () => getDirectionsToLocation(location)
+      })
+    } else {
+      const weather = await getWeatherByCoords(location.lat, location.lon)
+      location.temperature = weather?.main?.temp ?? 'N/A'
+
+      emit('marker-clicked', {
+        ...location,
+        type: location.type,
+        getDirections: () => getDirectionsToLocation(location)
+      })
+    }
 
     center.value = { lat: location.lat, lng: location.lon }
     mapRef.value?.map?.panTo(center.value)
   } catch (err) {
-    console.error('Weather fetch failed:', err)
+    console.error('Error fetching location details:', err)
   }
-}
-
-// 🚗 Get Directions
-function getDirectionsToLocation(destination) {
-  if (!navigator.geolocation) {
-    alert('Geolocation not supported')
-    return
-  }
-
-  navigator.geolocation.getCurrentPosition(
-    (position) => {
-      const origin = {
-        lat: position.coords.latitude,
-        lng: position.coords.longitude
-      }
-
-      const request = {
-        origin,
-        destination: { lat: destination.lat, lng: destination.lon },
-        travelMode: window.google.maps.TravelMode.DRIVING
-      }
-
-      directionsService.value.route(request, (result, status) => {
-        if (status === 'OK') {
-          directionsRenderer.setDirections(result)
-        } else {
-          alert('Failed to get directions.')
-        }
-      })
-    },
-    () => alert('Unable to get your location')
-  )
 }
 </script>
 

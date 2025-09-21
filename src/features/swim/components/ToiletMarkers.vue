@@ -1,4 +1,3 @@
-<!-- src/features/swim/components/ToiletMarkers.vue -->
 <script setup>
 import { onMounted, ref } from 'vue'
 import { Marker } from 'vue3-google-map'
@@ -20,7 +19,12 @@ onMounted(async () => {
 })
 
 function handleClick(toilet) {
-  emit('marker-clicked', toilet)
+  emit('marker-clicked', {
+    ...toilet,
+    type: 'toilet',
+    name: toilet.place_name || 'Public Toilet',
+    description: 'Public toilet facility'
+  })
 }
 </script>
 
@@ -30,8 +34,11 @@ function handleClick(toilet) {
     :key="toilet.id"
     :options="{
       position: { lat: toilet.lat, lng: toilet.lon },
-      title: toilet.name || 'Toilet',
-      icon: { url: toilet.icon, scaledSize: { width: 30, height: 30 } }
+      title: toilet.place_name || 'Toilet',
+      icon: {
+        url: toilet.icon,
+        scaledSize: { width: 30, height: 30 }
+      }
     }"
     @click="handleClick(toilet)"
   />

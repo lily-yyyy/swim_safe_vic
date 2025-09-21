@@ -20,3 +20,6 @@ npm install v-calendar
 
 # 5. using .env for API keys
 npm install dotenv
+
+# 6. showing toast message
+npm install vue-toastification

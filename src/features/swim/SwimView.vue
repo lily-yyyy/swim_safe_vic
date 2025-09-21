@@ -1,4 +1,3 @@
-<!-- src/features/swim/SwimView.vue -->
 <script setup>
 import { ref, computed } from 'vue'
 
@@ -6,18 +5,22 @@ import { ref, computed } from 'vue'
 import SwimMap from './components/SwimMap.vue'
 import FilterSidebar from './components/FilterSidebar.vue'
 import InfoDialog from '@/components/ui/InfoDialog.vue'
+import ToiletInfo from '@/components/ui/ToiletInfo.vue'
 
-// Data
+// Data APIs
 import { getAllBeaches } from '@/api/webapi/beach_api'
 import { getAllRivers } from '@/api/webapi/river_api'
+import { getToiletById } from '@/api/webapi/toilet_api' // ✅ Add this
 
 // State
 const selectedLocation = ref(null)
+const selectedToilet = ref(null)
+
 const selectedFilters = ref({})
 const searchQuery = ref('')
-const allLocations = ref([]) // beaches + rivers
+const allLocations = ref([])
 
-// Load data
+// Load beaches and rivers
 async function loadLocations() {
   try {
     const beaches = await getAllBeaches()
@@ -47,34 +50,101 @@ async function loadLocations() {
     console.error('Error loading locations:', e)
   }
 }
-
 loadLocations()
 
-// 🔍 Live filtered search results for suggestions
+// Computed: Filtered search results
 const searchResults = computed(() => {
   if (!searchQuery.value.trim()) return []
   return allLocations.value.filter(loc =>
-    loc.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+    loc.name?.toLowerCase().includes(searchQuery.value.toLowerCase())
   )
 })
 
-// 🧭 Marker clicked on map
-function handleMarkerClicked(location) {
-  selectedLocation.value = location
-  searchQuery.value = '' // optional: clear after selection
+async function handleMarkerClicked(location) {
+  console.log('📌 Toilet clicked:', location)
+
+  if (location.type === 'toilet') {
+    try {
+      const data = await getToiletById(location.id)
+
+      const enrichedToilet = {
+        ...data,
+        id: data.id,
+        type: 'toilet',
+        name: data.toilet_name,
+        openingHours: data.opening_hours,
+        babyChange: data.baby_change,
+        male: data.male,
+        female: data.female,
+        unisex: data.unisex,
+        accessible: data.accessible,
+        allGender: data.all_gender,
+        lat: data.lat,
+        lon: data.lon,
+        getDirections: () => getDirectionsToLocation(data)
+      }
+
+      selectedToilet.value = enrichedToilet
+      selectedLocation.value = null // close any previous beach/river dialogs
+    } catch (e) {
+      console.error('❌ Failed to load toilet data:', e)
+    }
+  } else {
+    selectedLocation.value = {
+      ...location,
+      getDirections: () => getDirectionsToLocation(location)
+    }
+    selectedToilet.value = null // close toilet dialog
+    searchQuery.value = ''
+  }
 }
 
-// ❌ Info dialog close
+
+// // ✅ Map marker clicked
+// async function handleMarkerClicked(location) {
+//   console.log('kk Toilet clicked:', location)
+//   if (location.type === 'toilet') {
+//     try {
+//       const fullData = await getToiletById(location.id)
+//       selectedToilet.value = {
+//         ...fullData,
+//         getDirections: location.getDirections
+//       }
+//       selectedToilet.value = {
+//         ...data,
+//         id: data.id,
+//         type: 'toilet',
+//         name: data.toilet_name,
+//         openingHours: data.opening_hours,
+//         babyChange: data.baby_change,
+//         male: data.male,
+//         female: data.female,
+//         unisex: data.unisex,
+//         accessible: data.accessible,
+//         allGender: data.all_gender,
+//         getDirections: location.getDirections // preserve directions
+//       }
+//     } catch (e) {
+//       console.error('❌ Failed to load toilet:', e)
+//     }
+//   } else {
+//     selectedLocation.value = location
+//     searchQuery.value = ''
+//   }
+// }
+
+// ❌ Close dialogs
 function closeDialog() {
   selectedLocation.value = null
+  selectedToilet.value = null
 }
 
-// 🎯 Filters updated
+// 🧭 Filters updated
 function handleFilterChange(filters) {
   selectedFilters.value = filters
 }
 
-// 🔍 Search input updated
+// 🔍 Search input
 function handleSearchUpdate(query) {
   searchQuery.value = query
 }
@@ -86,12 +156,18 @@ function handleSearchSelected(location) {
     zoomTo: true
   }
 }
+
+// 💬 Toilet feedback submission
+function handleToiletFeedback(data) {
+  console.log('🚻 Feedback submitted:', data)
+  // You can also send this to your backend here
+}
 </script>
 
 <template>
   <div class="swim-page">
     <div class="map-container">
-      <!-- 🗺️ Map -->
+      <!-- 🗺️ MAP -->
       <SwimMap
         :filters="selectedFilters"
         :searchQuery="searchQuery"
@@ -99,7 +175,7 @@ function handleSearchSelected(location) {
         @marker-clicked="handleMarkerClicked"
       />
 
-      <!-- 🧭 Sidebar -->
+      <!-- 🧭 SIDEBAR -->
       <div class="floating-sidebar">
         <FilterSidebar
           :results="searchResults"
@@ -109,11 +185,19 @@ function handleSearchSelected(location) {
         />
       </div>
 
-      <!-- ℹ️ Info popup -->
+      <!-- ℹ️ Beach/River Info -->
       <InfoDialog
-        v-if="selectedLocation && !selectedLocation.zoomTo"
+        v-if="selectedLocation && selectedLocation.type !== 'toilet' && !selectedLocation.zoomTo"
         :location="selectedLocation"
         @close="closeDialog"
+      />
+
+      <!-- 🚻 Toilet Info -->
+      <ToiletInfo
+        v-if="selectedToilet"
+        :toilet="selectedToilet"
+        @close="closeDialog"
+        @submit="handleToiletFeedback"
       />
     </div>
   </div>

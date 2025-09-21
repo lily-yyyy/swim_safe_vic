@@ -6,6 +6,8 @@ import { ref } from 'vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import Planner from './components/Planer.vue'
 
+import videoSrc from '@/assets/video/background_video.mp4'
+
 const showDialog = ref(false)
 const router = useRouter()
 const goToSwimMap = () => router.push('/swim')
@@ -38,7 +40,7 @@ const goToSwimMap = () => router.push('/swim')
         />
       </div>
     </section>
-
+    
     <!--  Did You Know Section -->
     <section class="py-5 bg-light">
       <div class="container">

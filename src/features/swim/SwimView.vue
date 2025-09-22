@@ -81,7 +81,7 @@ async function handleMarkerClicked(location) {
         allGender: data.all_gender,
         lat: data.lat,
         lon: data.lon,
-        getDirections: () => getDirectionsToLocation(data)
+        getDirections: location.getDirections
       }
 
       selectedToilet.value = enrichedToilet
@@ -92,7 +92,7 @@ async function handleMarkerClicked(location) {
   } else {
     selectedLocation.value = {
       ...location,
-      getDirections: () => getDirectionsToLocation(location)
+      getDirections: location.getDirections
     }
     selectedToilet.value = null // close toilet dialog
     searchQuery.value = ''

@@ -9,7 +9,9 @@
         <div class="row align-items-center">
           <div class="col-md-6 mb-4 mb-md-0">
             <h1 class="fw-bold display-5">Learn With Us</h1>
-            <p class="lead">Discover how water quality affects your health and the environment.</p>
+            <p class="lead">
+              Discover how water quality affects your health and the environment.
+            </p>
             <button
               class="btn btn-info text-white px-4 py-2 rounded-pill mt-3"
               @click="scrollToParameters"
@@ -29,12 +31,42 @@
       <div class="container">
         <h2 class="text-center fw-bold mb-4">Key Water Quality Parameters</h2>
         <div class="row g-4">
-          <ParameterCard icon="ph_drop.svg" title="pH" subtitle="Safe: ∈ 3–5.0" description="Too contges in strivay, galy dgg" />
-          <ParameterCard icon="turbidity.svg" title="Turbidity" subtitle="Cloudness:" description="law DO  Teb kills high DOt bubble disease" />
-          <ParameterCard icon="salinity.svg" title="Salinity" subtitle="Too salty" description="tou Salty☹ ; bubbde1 disease" />
-          <ParameterCard icon="dissolved_oxygen.svg" title="Dissolved Oxygen" subtitle="Low DO" description="heat stress, cold shock" />
-          <ParameterCard icon="phosphorus.svg" title="Phosphorus" subtitle="Drives elgal Slooms" description="rashes, f’un deaths" />
-          <ParameterCard icon="enterococci.svg" title="Enterococci" subtitle="Focal indicator" description="infection risk" />
+          <ParameterCard
+            icon="ph_drop.svg"
+            title="pH"
+            subtitle="Safe range: 6.5 – 8.5"
+            description="If the water is too acidic or basic, it can harm fish and irritate your skin and eyes."
+          />
+          <ParameterCard
+            icon="turbidity.svg"
+            title="Turbidity"
+            subtitle="Measures cloudiness"
+            description="Cloudy water can mean pollution. It blocks sunlight and can carry germs that make you sick."
+          />
+          <ParameterCard
+            icon="salinity.svg"
+            title="Salinity"
+            subtitle="Salt level in water"
+            description="Too much salt can hurt plants and animals. Safe levels help protect freshwater life."
+          />
+          <ParameterCard
+            icon="dissolved_oxygen.svg"
+            title="Dissolved Oxygen"
+            subtitle="Oxygen for aquatic life"
+            description="Fish and other animals need oxygen in water to survive. Low levels can lead to fish kills."
+          />
+          <ParameterCard
+            icon="phosphorus.svg"
+            title="Phosphorus"
+            subtitle="Nutrient pollution"
+            description="Too much phosphorus causes algae blooms, which can make water unsafe and smelly."
+          />
+          <ParameterCard
+            icon="enterococci.svg"
+            title="Enterococci"
+            subtitle="Bacteria from poo"
+            description="High levels mean the water may have feces, which can spread illness. Don’t swim if levels are high."
+          />
         </div>
       </div>
     </section>
@@ -52,9 +84,24 @@
 
         <div class="text-center fw-semibold mb-3">How to protect yourself</div>
         <div class="row g-4">
-          <ProtectCard icon="before_swim.svg" title="Before" line1="Wait 1–2 days after etin" line2="Check signs & flags." />
-          <ProtectCard icon="during_swim_no_drop.svg" title="During" line1="Don’t Swellow water" line2="Avoid draes & river mouths" />
-          <ProtectCard icon="after_swim_shower.svg" title="After" line1="Shower wash hands" line2="Tell an adult it" />
+          <ProtectCard
+            icon="before_swim.svg"
+            title="Before"
+            line1="Wait 1–2 days after heavy rain"
+            line2="Check local water safety signs"
+          />
+          <ProtectCard
+            icon="during_swim_no_drop.svg"
+            title="During"
+            line1="Avoid swallowing water"
+            line2="Stay away from drains and river mouths"
+          />
+          <ProtectCard
+            icon="after_swim_shower.svg"
+            title="After"
+            line1="Take a shower after swimming"
+            line2="Wash hands before eating"
+          />
         </div>
       </div>
     </section>
@@ -64,18 +111,20 @@
 <script setup>
 import { ref } from 'vue'
 
-// 🔗 Scroll to Parameters
+// Hero image
+const heroImage = new URL('@/assets/images/education_1.png', import.meta.url).href
+
+// Refs
 const parameterSection = ref(null)
 
+// Scroll to parameter cards on button click
 const scrollToParameters = () => {
   parameterSection.value?.scrollIntoView({ behavior: 'smooth' })
 }
 
-// 🖼 Hero image
-const heroImage = new URL('@/assets/images/education_1.png', import.meta.url).href
+// Components
 
-// 🧩 Components
-import ParameterCard from './components/ ParameterCard.vue'
-import RainIcon from './components/RainIcon.vue'
+import ParameterCard from './components/ ParameterCard.vue' 
+import RainIcon from './components/RainIcon.vue' 
 import ProtectCard from './components/ProtectCard.vue'
 </script>

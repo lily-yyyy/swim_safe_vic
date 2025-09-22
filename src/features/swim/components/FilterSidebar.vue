@@ -107,14 +107,14 @@ function selectSuggestion(item) {
     </section>
 
     <!-- Distance -->
-    <section>
+    <!-- <section>
       <label>Distance</label>
       <div class="btn-group">
         <button class="btn" :class="{ active: filters.distance === '1km' }" @click="setFilter('distance', '1km')">1km</button>
         <button class="btn" :class="{ active: filters.distance === '5km' }" @click="setFilter('distance', '5km')">5km</button>
         <button class="btn" :class="{ active: filters.distance === '10km' }" @click="setFilter('distance', '10km')">10km</button>
       </div>
-    </section>
+    </section> -->
 
     <!-- Amenities -->
     <section>
@@ -132,14 +132,14 @@ function selectSuggestion(item) {
     </section>
 
     <!-- Toilet Accessibility -->
-    <section>
+    <!-- <section>
       <label>Toilet Accessibility</label>
       <div class="btn-group">
         <button class="btn" :class="{ active: filters.toiletAccessibility === 'female' }" @click="setFilter('toiletAccessibility', 'female')">Female</button>
         <button class="btn" :class="{ active: filters.toiletAccessibility === 'male' }" @click="setFilter('toiletAccessibility', 'male')">Male</button>
         <button class="btn" :class="{ active: filters.toiletAccessibility === 'all' }" @click="setFilter('toiletAccessibility', 'all')">All Gender</button>
       </div>
-    </section>
+    </section> -->
 
     <!-- 🧾 Results section -->
     <section>

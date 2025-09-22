@@ -1,5 +1,4 @@
 <script setup>
-// Use Vue Router for button navigation
 import { useRouter } from 'vue-router'
 import { ref } from 'vue'
 
@@ -10,17 +9,18 @@ import videoSrc from '@/assets/video/background_video.mp4'
 
 const showDialog = ref(false)
 const router = useRouter()
+
 const goToSwimMap = () => router.push('/swim')
+const goToLearn = () => router.push('/learn') // ✅ NEW
 </script>
 
 <template>
   <div class="container-fluid p-0 home-view">
-<!-- planner code -->
+    <!-- 🗓️ Planner -->
     <BaseButton label="Planner" @click="showDialog = true" />
-
     <Planner v-if="showDialog" @close="showDialog = false" />
 
-    <!--  Hero Section -->
+    <!-- 🏖️ Hero Section -->
     <section class="hero d-flex align-items-center text-center">
       <div class="container">
         <div class="hero-content">
@@ -30,7 +30,7 @@ const goToSwimMap = () => router.push('/swim')
           </p>
         </div>
 
-        <!-- Custom BaseButton -->
+        <!-- Hero CTA -->
         <BaseButton
           label="Explore Water Map"
           variant="primary"
@@ -40,8 +40,8 @@ const goToSwimMap = () => router.push('/swim')
         />
       </div>
     </section>
-    
-    <!--  Did You Know Section -->
+
+    <!-- 📊 Did You Know Section -->
     <section class="py-5 bg-light">
       <div class="container">
         <div class="row align-items-center">
@@ -61,7 +61,7 @@ const goToSwimMap = () => router.push('/swim')
       </div>
     </section>
 
-    <!--  Warning Section -->
+    <!-- ⚠️ Warning Section -->
     <section class="py-5 text-white text-center warning-banner">
       <div class="container">
         <h3 class="warning-title mb-1">
@@ -71,64 +71,63 @@ const goToSwimMap = () => router.push('/swim')
       </div>
     </section>
 
-    <!-- 📚 Feature Cards Section -->
+    <!-- 📌 Feature Cards Section -->
     <section class="py-5 cards-section">
-  <div class="container">
-    <div class="row g-4">
-      <!-- Card 1 -->
-      <div class="col-md-4">
-        <div class="custom-card text-center">
-          <div class="card-body">
-            <h5 class="card-title fw-bold mb-4">Learn and Protect</h5>
-            <div class="d-grid gap-3">
-              <BaseButton label="Water Metrics" variant="primary" />
-              <BaseButton label="How we measure water quality" variant="primary" />
-              <BaseButton label="How to protect yourself" variant="primary" />
-              <BaseButton label="How does rainfall impact the water" variant="primary" />
+      <div class="container">
+        <div class="row g-4">
+          <!-- 🧠 Card 1 - Learn and Protect -->
+          <div class="col-md-4">
+            <div class="custom-card text-center">
+              <div class="card-body">
+                <h5 class="card-title fw-bold mb-4">Learn and Protect</h5>
+                <div class="d-grid gap-3">
+                  <BaseButton label="Water Metrics" variant="primary" @click="goToLearn" />
+                  <BaseButton label="How we measure water quality" variant="primary" @click="goToLearn" />
+                  <BaseButton label="How to protect yourself" variant="primary" @click="goToLearn" />
+                  <BaseButton label="How does rainfall impact the water" variant="primary" @click="goToLearn" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 🏊‍♂️ Card 2 - Swim Safety -->
+          <div class="col-md-4">
+            <div class="custom-card text-center">
+              <div class="card-body">
+                <h5 class="card-title fw-bold mb-3">Real-Time Swim Safety</h5>
+                <p class="card-text mb-4">
+                  Interactive map showing real-time safety indicators for beaches and rivers.
+                </p>
+                <BaseButton label="View Map" variant="primary" @click="goToSwimMap" />
+              </div>
+            </div>
+          </div>
+
+          <!-- 🚻 Card 3 - Find Amenities -->
+          <div class="col-md-4">
+            <div class="custom-card text-center">
+              <div class="card-body">
+                <h5 class="card-title fw-bold mb-3">Find Amenities</h5>
+                <p class="card-text mb-4">
+                  Locate public toilets and water fountains with recent cleanliness reports.
+                </p>
+                <BaseButton label="View Map" variant="primary" @click="goToSwimMap" />
+              </div>
             </div>
           </div>
         </div>
       </div>
-
-      <!-- Card 2 -->
-      <div class="col-md-4">
-        <div class="custom-card text-center">
-          <div class="card-body">
-            <h5 class="card-title fw-bold mb-3">Real-Time Swim Safety</h5>
-            <p class="card-text mb-4">
-              Interactive map showing real-time safety indicators for beaches and rivers.
-            </p>
-            <BaseButton label="View Map" variant="primary" @click="goToSwimMap" />
-          </div>
-        </div>
-      </div>
-
-      <!-- Card 3 -->
-      <div class="col-md-4">
-        <div class="custom-card text-center">
-          <div class="card-body">
-            <h5 class="card-title fw-bold mb-3">Find Amenities</h5>
-            <p class="card-text mb-4">
-              Locate public toilets and water fountains with recent cleanliness reports.
-            </p>
-            <BaseButton label="View Map" variant="primary" @click="goToSwimMap" />
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
+    </section>
   </div>
 </template>
 
 <style scoped>
-/*  Page Background */
+/* 🌍 Page Background */
 .home-view {
   background-color: #FFFFE7;
 }
 
-/*  Hero Section */
+/* 🏖️ Hero Section */
 .hero {
   background: url('@/assets/images/hero-background.png') center center/cover no-repeat;
   height: 100vh;
@@ -136,7 +135,7 @@ const goToSwimMap = () => router.push('/swim')
 }
 
 .hero-content {
-  margin-top: -60px; /* Move Safe Water text slightly upward */
+  margin-top: -60px;
 }
 
 .text-hero-title {
@@ -149,7 +148,7 @@ const goToSwimMap = () => router.push('/swim')
   font-size: 3.3rem;
 }
 
-/*  Hero Button Custom Style */
+/* 🎯 Hero Button */
 .hero-button {
   font-weight: 600;
   font-size: 1.1rem;
@@ -167,7 +166,7 @@ const goToSwimMap = () => router.push('/swim')
   transform: scale(1.05);
 }
 
-/*  Warning Section */
+/* ⚠️ Warning Banner */
 .warning-banner {
   background: linear-gradient(90deg, #5fd5c1 0%, #5ac1b0 100%);
   color: white;
@@ -184,18 +183,18 @@ const goToSwimMap = () => router.push('/swim')
   font-weight: 700;
 }
 
-/*  Light background override */
+/* 📄 Light background override */
 .bg-light {
   background-color: #FFFFE7 !important;
 }
 
-/*  Custom Card Style */
+/* 🧾 Cards Section */
 .cards-section {
   background-color: #FFFFE7;
 }
 
 .custom-card {
-  background-color: #5fd5c1; /* light aqua */
+  background-color: #5fd5c1;
   border-radius: 20px;
   padding: 2rem;
   height: 100%;
@@ -208,12 +207,11 @@ const goToSwimMap = () => router.push('/swim')
   transform: translateY(-4px);
 }
 
-
 .btn-rounded-outline {
-  background-color: #5fd5c1; /* light aqua */
-  border: 2px solid #264653; /* dark border */
+  background-color: #5fd5c1;
+  border: 2px solid #264653;
   color: #264653;
-  border-radius: 999px; /* pill shape */
+  border-radius: 999px;
   font-weight: 500;
   padding: 0.5rem 1.5rem;
   font-size: 1rem;
@@ -227,7 +225,7 @@ const goToSwimMap = () => router.push('/swim')
   transform: scale(1.05);
 }
 
-/* 📱 Responsive Adjustments */
+/* 📱 Responsive */
 @media (max-width: 768px) {
   .text-hero-title {
     font-size: 2.8rem;

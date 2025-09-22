@@ -36,9 +36,9 @@
           <li class="nav-item">
             <router-link class="nav-link text-white" to="/swim">Water Map</router-link>
           </li>
-          <li class="nav-item">
+          <!-- <li class="nav-item">
             <router-link class="nav-link text-white" to="/about">About</router-link>
-          </li>
+          </li> -->
           <li class="nav-item">
             <router-link class="nav-link text-white" to="/learn">Learn With Us</router-link>
           </li>

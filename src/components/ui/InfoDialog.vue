@@ -52,9 +52,9 @@
 
     <!-- Actions -->
     <div class="d-flex justify-content-between mt-3">
-      <button class="btn btn-outline-secondary btn-sm px-3">
+      <!-- <button class="btn btn-outline-secondary btn-sm px-3">
         Save
-      </button>
+      </button> -->
       <button
         class="btn btn-primary btn-sm px-3"
         @click="location.getDirections?.()"

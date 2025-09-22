@@ -1,13 +1,15 @@
 <template>
   <div class="toilet-info-overlay">
     <div class="dialog">
+      <!-- Fixed Header -->
       <div class="dialog-header">
         <h2>{{ toilet.toilet_name || 'Unnamed Toilet' }}</h2>
         <p class="subtitle">Public Toilet Information</p>
-        <button class="close-btn" @click="$emit('close')">×</button>
+        
       </div>
 
-      <div class="dialog-body">
+      <!-- Scrollable Content -->
+      <div class="dialog-content">
         <!-- Rating -->
         <div class="rating-row">
           <span class="stars">★ ★ ★ ★ ★</span>
@@ -43,14 +45,8 @@
         <div class="form-section">
           <p><strong>Is this toilet clean?</strong></p>
           <div class="radio-group">
-            <label>
-              <input type="radio" v-model="cleanStatus" value="yes" />
-              Yes
-            </label>
-            <label>
-              <input type="radio" v-model="cleanStatus" value="no" />
-              No
-            </label>
+            <label><input type="radio" v-model="cleanStatus" value="yes" /> Yes</label>
+            <label><input type="radio" v-model="cleanStatus" value="no" /> No</label>
           </div>
 
           <p><strong>Rate the toilet:</strong></p>
@@ -70,50 +66,36 @@
             placeholder="Share your experience..."
             rows="3"
           ></textarea>
-
-          <div class="form-actions">
-            <button class="submit-btn" @click="submitForm">Submit</button>
-            <button class="cancel-btn" @click="$emit('close')">Cancel</button>
-          </div>
         </div>
+      </div>
+
+      <!-- Fixed Footer -->
+      <div class="dialog-footer">
+        <button class="submit-btn" @click="submitForm">Submit</button>
+        <button class="cancel-btn" @click="$emit('close')">Cancel</button>
       </div>
     </div>
   </div>
 </template>
 
-
-
 <script setup>
 import { ref } from 'vue'
 
-// Props
 const props = defineProps({
-  toilet: {
-    type: Object,
-    required: true
-  }
+  toilet: { type: Object, required: true }
 })
 
-// Emits
 const emit = defineEmits(['close', 'submit'])
 
-// Form data
 const cleanStatus = ref('yes')
 const rating = ref(0)
 const comment = ref('')
 
-
 function handleDirections() {
-  if (props.toilet.getDirections) {
-    props.toilet.getDirections()
-  } else {
-    alert('Directions not available.')
-  }
-
-  // Close dialog after requesting directions
+  if (props.toilet.getDirections) props.toilet.getDirections()
+  else alert('Directions not available.')
   emit('close')
 }
-
 
 function submitForm() {
   const data = {
@@ -125,14 +107,14 @@ function submitForm() {
 
   console.log('🧻 Submitted Toilet Feedback:', data)
   emit('submit', data)
-  emit('close') // Optionally close dialog after submit
+  emit('close')
 }
 </script>
 
 <style scoped>
 .toilet-info-overlay {
   position: fixed;
-  top: 64px; /* leave space below nav */
+  top: 64px; /* leave space below navbar */
   left: 0;
   right: 0;
   bottom: 0;
@@ -140,44 +122,70 @@ function submitForm() {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding-top: 40px;
+  padding: 20px;
   z-index: 9999;
+  overflow-y: auto;
 }
 
 .dialog {
   background: #fff;
-  padding: 24px;
+  width: 100%;
+  max-width: 420px;
   border-radius: 12px;
-  width: 420px;
-  max-width: 95%;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-  position: relative;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  overflow: hidden;
 }
 
+/* Fixed Header */
 .dialog-header {
-  margin-bottom: 16px;
+  padding: 16px 20px;
+  border-bottom: 1px solid #eee;
+  position: relative;
+  background: white;
+  z-index: 1;
 }
 
 .dialog-header h2 {
   margin: 0;
-  font-size: 1.4rem;
+  font-size: 1.3rem;
 }
 
 .subtitle {
-  color: #4b6584;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
+  color: #555;
 }
 
 .close-btn {
   position: absolute;
   top: 16px;
-  right: 20px;
+  right: 16px;
   font-size: 1.4rem;
   background: none;
   border: none;
   cursor: pointer;
 }
 
+/* Scrollable Content */
+.dialog-content {
+  padding: 16px 20px;
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+/* Fixed Footer */
+.dialog-footer {
+  padding: 12px 20px;
+  border-top: 1px solid #eee;
+  background: white;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* Shared Styles */
 .rating-row {
   display: flex;
   align-items: center;
@@ -196,7 +204,7 @@ function submitForm() {
 
 .access-icons span {
   font-size: 1.2rem;
-  margin-right: 8px;
+  margin-right: 6px;
 }
 
 .directions-btn {
@@ -210,29 +218,25 @@ function submitForm() {
   font-size: 0.95rem;
 }
 
-.form-section {
-  margin-top: 16px;
-}
-
 .radio-group {
   display: flex;
-  gap: 20px;
-  margin: 6px 0 12px;
+  gap: 16px;
+  margin-bottom: 12px;
 }
 
 .stars-input {
   display: flex;
   font-size: 1.4rem;
-  margin: 6px 0 12px;
+  margin-bottom: 12px;
 }
 
-.stars-input .star {
+.star {
   cursor: pointer;
   color: #ccc;
   margin-right: 4px;
 }
 
-.stars-input .star.filled {
+.star.filled {
   color: #f5a623;
 }
 
@@ -245,12 +249,7 @@ textarea {
   font-family: inherit;
 }
 
-.form-actions {
-  margin-top: 12px;
-  display: flex;
-  justify-content: space-between;
-}
-
+/* Buttons */
 .submit-btn {
   background: #007b7f;
   color: white;
@@ -258,13 +257,23 @@ textarea {
   border: none;
   border-radius: 6px;
   cursor: pointer;
+  flex: 1;
 }
 
 .cancel-btn {
   background: transparent;
   border: 1px solid #999;
+  color: #333;
   padding: 8px 16px;
   border-radius: 6px;
   cursor: pointer;
+  flex: 1;
+}
+
+/* Responsive (Optional) */
+@media (max-height: 500px) {
+  .dialog {
+    max-height: 100vh;
+  }
 }
 </style>

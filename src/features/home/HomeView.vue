@@ -6,6 +6,7 @@ import BaseButton from '@/components/ui/BaseButton.vue'
 import Planner from './components/Planer.vue'
 
 import videoSrc from '@/assets/video/background_video.mp4'
+import herobutton from '@/assets/buttons/hero_button.png'
 
 const showDialog = ref(false)
 const router = useRouter()
@@ -21,23 +22,21 @@ const goToLearn = () => router.push('/learn') // ✅ NEW
     <Planner v-if="showDialog" @close="showDialog = false" />
 
     <!-- 🏖️ Hero Section -->
-    <section class="hero d-flex align-items-center text-center">
-      <div class="container">
+    <section class="hero d-flex align-iterms-center text-center">
+      <!-- background video  -->
+      <video class="hero-video" :src="videoSrc" alt="background video" autoplay muted loop playsinlin></video>
+      <div class="hero-overlay"></div>
+      <div class="container hero-content-wrapper">
         <div class="hero-content">
           <h1 class="display-2 fw-bold text-hero-title">Safe Water</h1>
-          <p class="lead mb-4 text-hero-subtitle">
-            Plan, check, and enjoy the clean water
-          </p>
+          <p class="lead mb-4 text-hero-subtitle">Plan, check, and enjoy the clean water</p>
         </div>
 
+        <!-- Hero CTA --> 
         <!-- Hero CTA -->
-        <BaseButton
-          label="Explore Water Map"
-          variant="primary"
-          size="xl"
-          class="hero-button"
-          @click="goToSwimMap"
-        />
+        <button class="hero-button" @click="goToSwimMap">
+          Explore Water Map
+        </button>
       </div>
     </section>
 
@@ -129,9 +128,41 @@ const goToLearn = () => router.push('/learn') // ✅ NEW
 
 /* 🏖️ Hero Section */
 .hero {
-  background: url('@/assets/images/hero-background.png') center center/cover no-repeat;
+  position: relative;
   height: 100vh;
   color: #ffffff;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-video {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  transform: translateX(-50%) translateY(-50%);
+  object-fit: cover;
+}
+
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3); /* Dark overlay for better text readability */
+  z-index: -1;
+}
+
+/* Hero Content */
+.hero-content-wrapper {
+  position: relative;
+  z-index: 1;
 }
 
 .hero-content {
@@ -148,22 +179,29 @@ const goToLearn = () => router.push('/learn') // ✅ NEW
   font-size: 3.3rem;
 }
 
-/* 🎯 Hero Button */
+/* Hero Button */
 .hero-button {
-  font-weight: 600;
-  font-size: 1.1rem;
-  padding: 0.75rem 2.5rem;
-  border-radius: 999px;
-  background-color: hsl(191, 74%, 62%);
-  color: white;
+  display: inline-block;;
+  padding-bottom: -60px;
+  width: 200px;
+  height: 200px;
+  background-image: url(@/assets/buttons/hero_button.png);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: transparent;
   border: none;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: background-color 0.3s ease, transform 0.3s ease;
+  cursor: pointer; 
+  color: #504c4c; 
+  font-size: 1rem;
+  font-weight: bold;
+  padding-top: 30px;
+  margin-top: 50px;
 }
 
 .hero-button:hover {
-  background-color: #1a9fa1;
   transform: scale(1.05);
+  opacity: 0.6;
 }
 
 /* ⚠️ Warning Banner */
@@ -250,6 +288,13 @@ const goToLearn = () => router.push('/learn') // ✅ NEW
 
   .warning-subtitle {
     font-size: 1.1rem;
+  }
+
+  /* Additional mobile optimizations for video */
+  @media (max-width: 768px){
+    .hero-video {
+      object-position: center center;
+    }
   }
 }
 </style>

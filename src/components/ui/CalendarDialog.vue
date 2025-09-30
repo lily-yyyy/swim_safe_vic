@@ -142,7 +142,7 @@ function validateEmail(email) {
   return pattern.test(email)
 }
 
-// ❌ Handle click outside to close
+//  Handle click outside to close
 function handleBackdropClick() {
   emit('close')
 }

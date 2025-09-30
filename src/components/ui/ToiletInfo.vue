@@ -5,7 +5,6 @@
       <div class="dialog-header">
         <h2>{{ toilet.toilet_name || 'Unnamed Toilet' }}</h2>
         <p class="subtitle">Public Toilet Information</p>
-        
       </div>
 
       <!-- Scrollable Content -->
@@ -13,11 +12,11 @@
         <!-- Rating -->
         <div class="rating-row">
           <span class="stars">★ ★ ★ ★ ★</span>
-          <span class="rating-value">{{ toilet.rating ?? '4.2' }}</span>
+          <span class="rating-value">{{ toilet.averageRating ?? 'No rating' }}</span>
         </div>
 
         <!-- Details -->
-        <p><strong>Opening hours:</strong> {{ toilet.opening_hours || '7:00 am – 9:00 pm' }}</p>
+        <p><strong>Opening hours:</strong> {{ toilet.openingHours || '7:00 am – 9:00 pm' }}</p>
 
         <p><strong>Accessible for:</strong>
           <span class="access-icons">
@@ -31,12 +30,31 @@
               <span v-if="toilet.male" title="Men">👨</span>
               <span v-if="toilet.female" title="Women">👩</span>
               <span v-if="toilet.accessible" title="Disability Access">♿</span>
-              <span v-if="toilet.all_gender" title="All Genders">🧑‍🦽</span>
+              <span v-if="toilet.allGender" title="All Genders">🧑‍🦽</span>
             </template>
           </span>
         </p>
 
-        <p><strong>Baby Change:</strong> {{ toilet.baby_change ? 'Available' : 'Not available' }}</p>
+        <p><strong>Baby Change:</strong> {{ toilet.babyChange ? 'Available' : 'Not available' }}</p>
+
+        <!--  Latest Comments -->
+        <div v-if="toilet.comments?.length" class="mb-3">
+          <h6>Latest Comments:</h6>
+          <ul class="list-group">
+            <li
+              v-for="c in toilet.comments"
+              :key="c.id"
+              class="list-group-item"
+            >
+              <p class="mb-1">“{{ c.comment }}”</p>
+              <small class="text-muted">
+                {{ new Date(c.created_at).toLocaleDateString() }}
+                • {{ new Date(c.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }}
+              </small>
+            </li>
+          </ul>
+        </div>
+        <p v-else class="text-muted">No comments yet</p>
 
         <!-- Directions -->
         <button class="directions-btn" @click="handleDirections">📍 Directions</button>
@@ -105,9 +123,9 @@ function submitForm() {
     comment: comment.value
   }
 
-  console.log('🧻 Submitted Toilet Feedback:', data)
+  
   emit('submit', data)
-  emit('close')
+  
 }
 </script>
 
@@ -158,16 +176,6 @@ function submitForm() {
   color: #555;
 }
 
-.close-btn {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  font-size: 1.4rem;
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-
 /* Scrollable Content */
 .dialog-content {
   padding: 16px 20px;
@@ -216,6 +224,7 @@ function submitForm() {
   cursor: pointer;
   margin: 12px 0;
   font-size: 0.95rem;
+  width: 100%;
 }
 
 .radio-group {

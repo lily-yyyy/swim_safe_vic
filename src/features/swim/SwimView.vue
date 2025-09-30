@@ -10,7 +10,12 @@ import ToiletInfo from '@/components/ui/ToiletInfo.vue'
 // Data APIs
 import { getAllBeaches } from '@/api/webapi/beach_api'
 import { getAllRivers } from '@/api/webapi/river_api'
-import { getToiletById } from '@/api/webapi/toilet_api' // ✅ Add this
+import {
+  submitToiletRating,
+  getToiletById,
+  getToiletAverageRating,
+  getLatestToiletComments
+} from '@/api/webapi/toilet_api'
 
 // State
 const selectedLocation = ref(null)
@@ -19,6 +24,39 @@ const selectedToilet = ref(null)
 const selectedFilters = ref({})
 const searchQuery = ref('')
 const allLocations = ref([])
+
+
+// submit to db
+async function handleToiletFeedback(data) {
+  try {
+    const payload = {
+      user_id: 2,
+      toilet_id: data.toiletId,
+      rating: data.rating,
+      comment: data.comment
+    }
+
+    const res = await submitToiletRating(payload)
+    
+
+    // refresh average & comments
+    const avg = await getToiletAverageRating(data.toiletId)
+    const allComments = await getLatestToiletComments()
+    selectedToilet.value = {
+      ...selectedToilet.value,
+      averageRating: avg?.average_rating ?? null,
+      comments: allComments.filter(c => c.toilet_id === data.toiletId)
+    }
+
+    //  close only after successful save
+    closeDialog()
+  } catch (err) {
+    console.error(' Failed to save toilet feedback:', err)
+    alert('Could not save feedback')
+  }
+}
+
+
 
 // Load beaches and rivers
 async function loadLocations() {
@@ -34,7 +72,7 @@ async function loadLocations() {
         description: b.description_tips || 'No description.',
         status: b.status || 'Unknown',
         lat: b.lat,
-        lon: b.lon,
+        lon: b.lon
       })),
       ...rivers.map(r => ({
         ...r,
@@ -43,7 +81,7 @@ async function loadLocations() {
         description: r.description || 'No description.',
         status: r.status || 'Unknown',
         lat: r.lat,
-        lon: r.lon,
+        lon: r.lon
       }))
     ]
   } catch (e) {
@@ -60,12 +98,27 @@ const searchResults = computed(() => {
   )
 })
 
+// Handle marker click (beach/river/toilet)
+
 async function handleMarkerClicked(location) {
-  console.log('📌 Toilet clicked:', location)
+  
 
   if (location.type === 'toilet') {
     try {
+      
       const data = await getToiletById(location.id)
+      
+
+      
+      const avg = await getToiletAverageRating(location.id)
+      
+
+      
+      const allComments = await getLatestToiletComments()
+      
+
+      const toiletComments = allComments.filter(c => c.toilet_id === location.id)
+      
 
       const enrichedToilet = {
         ...data,
@@ -81,36 +134,50 @@ async function handleMarkerClicked(location) {
         allGender: data.all_gender,
         lat: data.lat,
         lon: data.lon,
-        getDirections: location.getDirections
+        getDirections: location.getDirections,
+        averageRating: avg?.average_rating ?? null,
+        comments: toiletComments
       }
 
+      
+
       selectedToilet.value = enrichedToilet
-      selectedLocation.value = null // close any previous beach/river dialogs
+      selectedLocation.value = null
     } catch (e) {
-      console.error('❌ Failed to load toilet data:', e)
+      
     }
   } else {
+    
     selectedLocation.value = {
       ...location,
       getDirections: location.getDirections
     }
-    selectedToilet.value = null // close toilet dialog
+    selectedToilet.value = null
     searchQuery.value = ''
   }
 }
 
-
-// // ✅ Map marker clicked
 // async function handleMarkerClicked(location) {
-//   console.log('kk Toilet clicked:', location)
+//   console.log('📌 Marker clicked:', location)
+
 //   if (location.type === 'toilet') {
 //     try {
-//       const fullData = await getToiletById(location.id)
-//       selectedToilet.value = {
-//         ...fullData,
-//         getDirections: location.getDirections
-//       }
-//       selectedToilet.value = {
+//       console.log('🔍 Fetching toilet by ID:', location.id)
+//       // ✅ 1. Get toilet details
+//       const data = await getToiletById(location.id)
+//        console.log('✅ Toilet details response:', data)
+
+//       // ✅ 2. Get average rating
+//       const avg = await getToiletAverageRating(location.id)
+//       console.log('✅ Average rating response:', avg)
+
+//       // ✅ 3. Get latest comments and filter for this toilet
+//       const allComments = await getLatestToiletComments()
+//       const toiletComments = allComments.filter(c => c.toilet_id === location.id)
+//         console.log('✅ All comments response:', allComments)
+
+//       // ✅ 4. Build enriched toilet object
+//       const enrichedToilet = {
 //         ...data,
 //         id: data.id,
 //         type: 'toilet',
@@ -122,34 +189,46 @@ async function handleMarkerClicked(location) {
 //         unisex: data.unisex,
 //         accessible: data.accessible,
 //         allGender: data.all_gender,
-//         getDirections: location.getDirections // preserve directions
+//         lat: data.lat,
+//         lon: data.lon,
+//         getDirections: location.getDirections,
+//         averageRating: avg?.average_rating ?? null,
+//         comments: toiletComments
 //       }
+
+//       selectedToilet.value = enrichedToilet
+//       selectedLocation.value = null // close any previous beach/river dialogs
 //     } catch (e) {
-//       console.error('❌ Failed to load toilet:', e)
+//       console.error('❌ Failed to load toilet data:', e)
 //     }
 //   } else {
-//     selectedLocation.value = location
+//     // Beach or river selected
+//     selectedLocation.value = {
+//       ...location,
+//       getDirections: location.getDirections
+//     }
+//     selectedToilet.value = null // close toilet dialog
 //     searchQuery.value = ''
 //   }
 // }
 
-// ❌ Close dialogs
+// Close dialogs
 function closeDialog() {
   selectedLocation.value = null
   selectedToilet.value = null
 }
 
-// 🧭 Filters updated
+// Filters updated
 function handleFilterChange(filters) {
   selectedFilters.value = filters
 }
 
-// 🔍 Search input
+//  Search input
 function handleSearchUpdate(query) {
   searchQuery.value = query
 }
 
-// ✅ Search suggestion selected
+// Search suggestion selected
 function handleSearchSelected(location) {
   selectedLocation.value = {
     ...location,
@@ -157,17 +236,13 @@ function handleSearchSelected(location) {
   }
 }
 
-// 💬 Toilet feedback submission
-function handleToiletFeedback(data) {
-  console.log('🚻 Feedback submitted:', data)
-  // You can also send this to your backend here
-}
+
 </script>
 
 <template>
   <div class="swim-page">
     <div class="map-container">
-      <!-- 🗺️ MAP -->
+      <!--  MAP -->
       <SwimMap
         :filters="selectedFilters"
         :searchQuery="searchQuery"
@@ -175,7 +250,7 @@ function handleToiletFeedback(data) {
         @marker-clicked="handleMarkerClicked"
       />
 
-      <!-- 🧭 SIDEBAR -->
+      <!--  SIDEBAR -->
       <div class="floating-sidebar">
         <FilterSidebar
           :results="searchResults"
@@ -185,14 +260,14 @@ function handleToiletFeedback(data) {
         />
       </div>
 
-      <!-- ℹ️ Beach/River Info -->
+      <!--  Beach/River Info -->
       <InfoDialog
         v-if="selectedLocation && selectedLocation.type !== 'toilet' && !selectedLocation.zoomTo"
         :location="selectedLocation"
         @close="closeDialog"
       />
 
-      <!-- 🚻 Toilet Info -->
+      <!--  Toilet Info -->
       <ToiletInfo
         v-if="selectedToilet"
         :toilet="selectedToilet"

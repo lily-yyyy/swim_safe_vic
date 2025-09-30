@@ -7,21 +7,21 @@ const emit = defineEmits(['marker-clicked'])
 const fountains = ref([])
 
 onMounted(async () => {
-  console.log('🚰 Fetching fountains...')
+  
   try {
     const data = await getFountains()
-    console.log('✅ Raw API data:', data)
+    
 
     let iconPath
     try {
       iconPath = new URL('@/assets/icons/fountains.svg', import.meta.url).href
       console.log('🖼️ Fountain icon path resolved:', iconPath)
     } catch (e) {
-      console.warn('⚠️ Fallback to default Google icon')
+      
       iconPath = 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
     }
 
-    // 🧠 Validate and map
+    //  Validate and map
     fountains.value = data
       .filter(f => f.lat && f.lon) // Filter out invalid entries
       .map(f => {
@@ -29,7 +29,7 @@ onMounted(async () => {
         const lon = parseFloat(f.lon)
 
         if (isNaN(lat) || isNaN(lon)) {
-          console.warn('⚠️ Skipping invalid coordinates:', f)
+         
           return null
         }
 
@@ -42,9 +42,9 @@ onMounted(async () => {
       })
       .filter(f => f !== null) // Remove skipped
 
-    console.log('✅ Loaded fountains:', fountains.value)
+    
   } catch (err) {
-    console.error('❌ Failed to load fountains:', err)
+    console.error(' Failed to load fountains:', err)
   }
 })
 

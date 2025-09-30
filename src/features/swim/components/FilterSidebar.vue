@@ -23,12 +23,12 @@ const filters = reactive({
 // Search query
 const searchQuery = ref('')
 
-// 🔁 Emit search input
+//  Emit search input
 watch(searchQuery, () => {
   emit('update:search', searchQuery.value)
 })
 
-// 🔁 Emit filters when updated
+//  Emit filters when updated
 watch(filters, () => {
   emit('update:filters', { ...filters })
 }, { deep: true })
@@ -48,6 +48,16 @@ function selectSuggestion(item) {
   emit('search-selected', item)
   searchQuery.value = item.name
 }
+
+//  Reset all filters + search
+function resetFilters() {
+  filters.showOnMap = 'all'
+  filters.waterQuality = null
+  filters.distance = null
+  filters.amenities = []
+  filters.toiletAccessibility = null
+  searchQuery.value = ''
+}
 </script>
 
 <template>
@@ -62,7 +72,7 @@ function selectSuggestion(item) {
         placeholder="Search beach, river location"
       />
 
-      <!-- 🔽 Search Suggestions -->
+      <!--  Search Suggestions -->
       <ul v-if="searchQuery && props.results.length" class="search-suggestions">
         <li
           v-for="(item, index) in props.results"
@@ -74,7 +84,7 @@ function selectSuggestion(item) {
       </ul>
     </div>
 
-    <!-- 🎯 Filters -->
+    <!--  Filters -->
     <h5>Filters</h5>
 
     <!-- Show on Map -->
@@ -141,9 +151,14 @@ function selectSuggestion(item) {
       </div>
     </section> -->
 
-    <!-- 🧾 Results section -->
+    <!--  Results section -->
     <section>
-      <label>Results</label>
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <label>Results</label>
+        <!-- 🔹 Reset Button -->
+        <button class="reset-btn" @click="resetFilters">Reset</button>
+      </div>
+
       <div v-for="(res, i) in props.results" :key="i" class="result-item">
         <div class="result-header">
           <img src="@/assets/icons/menu.svg" />
@@ -313,5 +328,21 @@ label {
 .status.caution {
   background: #fff3cd;
   color: #856404;
+}
+
+/* Reset Button */
+.reset-btn {
+  background: transparent;
+  border: 1px solid #999;
+  color: #333;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.2s;
+}
+
+.reset-btn:hover {
+  background: #f0f0f0;
 }
 </style>

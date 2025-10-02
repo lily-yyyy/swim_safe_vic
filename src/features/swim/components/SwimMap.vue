@@ -259,13 +259,13 @@ async function handleMarkerClick(location) {
         @click="handleMarkerClick(loc)"
       />
 
-      <!-- ✅ Toilets -->
+      <!--  Toilets -->
       <ToiletMarkers
         v-if="filters?.amenities?.includes('toilets')"
         @marker-clicked="handleMarkerClick"
       />
 
-      <!-- ✅ Fountains -->
+      <!--  Fountains -->
       <FountainMarkers
         v-if="filters?.amenities?.includes('fountains')"
         @marker-clicked="handleMarkerClick"

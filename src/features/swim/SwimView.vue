@@ -6,6 +6,7 @@ import SwimMap from './components/SwimMap.vue'
 import FilterSidebar from './components/FilterSidebar.vue'
 import InfoDialog from '@/components/ui/InfoDialog.vue'
 import ToiletInfo from '@/components/ui/ToiletInfo.vue'
+import Planner from '@/features/home/components/Planer.vue'
 
 // Data APIs
 import { getAllBeaches } from '@/api/webapi/beach_api'
@@ -17,7 +18,9 @@ import {
   getLatestToiletComments
 } from '@/api/webapi/toilet_api'
 
+// ----------------------
 // State
+// ----------------------
 const selectedLocation = ref(null)
 const selectedToilet = ref(null)
 
@@ -25,8 +28,44 @@ const selectedFilters = ref({})
 const searchQuery = ref('')
 const allLocations = ref([])
 
+const showPlanner = ref(false)
+const plannerPlaceType = ref('')
+const plannerPlaceId = ref('')
 
-// submit to db
+// Helper to safely get id from any location object
+function getPlaceIdFromLocation(loc) {
+  if (!loc) return ''
+  return (
+    loc.id ??
+    loc.beach_id ??
+    loc.river_id ??
+    ''
+  )
+}
+
+// ----------------------
+// Open Planner (always works, with prefill)
+// ----------------------
+function openPlanner(locationRefOrObj) {
+  // location may be a ref (selectedLocation) or a plain object
+  const loc = locationRefOrObj && 'value' in locationRefOrObj ? locationRefOrObj.value : locationRefOrObj
+
+  // Prefill planner data from the current location (beach/river)
+  plannerPlaceType.value = loc?.type || ''
+  plannerPlaceId.value = getPlaceIdFromLocation(loc)
+
+  // Close any open dialogs then force-remount Planner
+  closeDialog()
+  showPlanner.value = false
+  // next microtask to remount Planner fresh
+  setTimeout(() => {
+    showPlanner.value = true
+  }, 0)
+}
+
+// ----------------------
+// Submit Toilet Feedback
+// ----------------------
 async function handleToiletFeedback(data) {
   try {
     const payload = {
@@ -36,8 +75,7 @@ async function handleToiletFeedback(data) {
       comment: data.comment
     }
 
-    const res = await submitToiletRating(payload)
-    
+    await submitToiletRating(payload)
 
     // refresh average & comments
     const avg = await getToiletAverageRating(data.toiletId)
@@ -48,7 +86,6 @@ async function handleToiletFeedback(data) {
       comments: allComments.filter(c => c.toilet_id === data.toiletId)
     }
 
-    //  close only after successful save
     closeDialog()
   } catch (err) {
     console.error(' Failed to save toilet feedback:', err)
@@ -56,9 +93,9 @@ async function handleToiletFeedback(data) {
   }
 }
 
-
-
-// Load beaches and rivers
+// ----------------------
+// Load beaches & rivers
+// ----------------------
 async function loadLocations() {
   try {
     const beaches = await getAllBeaches()
@@ -85,12 +122,14 @@ async function loadLocations() {
       }))
     ]
   } catch (e) {
-    console.error('Error loading locations:', e)
+    console.error(' Error loading locations:', e)
   }
 }
 loadLocations()
 
-// Computed: Filtered search results
+// ----------------------
+// Computed Search Results
+// ----------------------
 const searchResults = computed(() => {
   if (!searchQuery.value.trim()) return []
   return allLocations.value.filter(loc =>
@@ -98,27 +137,16 @@ const searchResults = computed(() => {
   )
 })
 
-// Handle marker click (beach/river/toilet)
-
+// ----------------------
+// Handle Marker Click
+// ----------------------
 async function handleMarkerClicked(location) {
-  
-
   if (location.type === 'toilet') {
     try {
-      
       const data = await getToiletById(location.id)
-      
-
-      
       const avg = await getToiletAverageRating(location.id)
-      
-
-      
       const allComments = await getLatestToiletComments()
-      
-
       const toiletComments = allComments.filter(c => c.toilet_id === location.id)
-      
 
       const enrichedToilet = {
         ...data,
@@ -139,15 +167,12 @@ async function handleMarkerClicked(location) {
         comments: toiletComments
       }
 
-      
-
       selectedToilet.value = enrichedToilet
       selectedLocation.value = null
     } catch (e) {
-      
+      console.error(' Failed to load toilet data:', e)
     }
   } else {
-    
     selectedLocation.value = {
       ...location,
       getDirections: location.getDirections
@@ -157,86 +182,37 @@ async function handleMarkerClicked(location) {
   }
 }
 
-// async function handleMarkerClicked(location) {
-//   console.log('📌 Marker clicked:', location)
-
-//   if (location.type === 'toilet') {
-//     try {
-//       console.log('🔍 Fetching toilet by ID:', location.id)
-//       // ✅ 1. Get toilet details
-//       const data = await getToiletById(location.id)
-//        console.log('✅ Toilet details response:', data)
-
-//       // ✅ 2. Get average rating
-//       const avg = await getToiletAverageRating(location.id)
-//       console.log('✅ Average rating response:', avg)
-
-//       // ✅ 3. Get latest comments and filter for this toilet
-//       const allComments = await getLatestToiletComments()
-//       const toiletComments = allComments.filter(c => c.toilet_id === location.id)
-//         console.log('✅ All comments response:', allComments)
-
-//       // ✅ 4. Build enriched toilet object
-//       const enrichedToilet = {
-//         ...data,
-//         id: data.id,
-//         type: 'toilet',
-//         name: data.toilet_name,
-//         openingHours: data.opening_hours,
-//         babyChange: data.baby_change,
-//         male: data.male,
-//         female: data.female,
-//         unisex: data.unisex,
-//         accessible: data.accessible,
-//         allGender: data.all_gender,
-//         lat: data.lat,
-//         lon: data.lon,
-//         getDirections: location.getDirections,
-//         averageRating: avg?.average_rating ?? null,
-//         comments: toiletComments
-//       }
-
-//       selectedToilet.value = enrichedToilet
-//       selectedLocation.value = null // close any previous beach/river dialogs
-//     } catch (e) {
-//       console.error('❌ Failed to load toilet data:', e)
-//     }
-//   } else {
-//     // Beach or river selected
-//     selectedLocation.value = {
-//       ...location,
-//       getDirections: location.getDirections
-//     }
-//     selectedToilet.value = null // close toilet dialog
-//     searchQuery.value = ''
-//   }
-// }
-
-// Close dialogs
+// ----------------------
+// Close Dialogs
+// ----------------------
 function closeDialog() {
   selectedLocation.value = null
   selectedToilet.value = null
 }
 
+// ----------------------
 // Filters updated
+// ----------------------
 function handleFilterChange(filters) {
   selectedFilters.value = filters
 }
 
-//  Search input
+// ----------------------
+// Search input updated
+// ----------------------
 function handleSearchUpdate(query) {
   searchQuery.value = query
 }
 
-// Search suggestion selected
+// ----------------------
+// Search suggestion clicked
+// ----------------------
 function handleSearchSelected(location) {
   selectedLocation.value = {
     ...location,
     zoomTo: true
   }
 }
-
-
 </script>
 
 <template>
@@ -250,7 +226,7 @@ function handleSearchSelected(location) {
         @marker-clicked="handleMarkerClicked"
       />
 
-      <!--  SIDEBAR -->
+      <!-- 🎛 Sidebar -->
       <div class="floating-sidebar">
         <FilterSidebar
           :results="searchResults"
@@ -261,10 +237,21 @@ function handleSearchSelected(location) {
       </div>
 
       <!--  Beach/River Info -->
+      
       <InfoDialog
-        v-if="selectedLocation && selectedLocation.type !== 'toilet' && !selectedLocation.zoomTo"
-        :location="selectedLocation"
-        @close="closeDialog"
+  v-if="selectedLocation && selectedLocation.type !== 'toilet' && !selectedLocation.zoomTo"
+  :location="selectedLocation"
+  @close="closeDialog"
+  @open-planner="() => openPlanner(selectedLocation)"
+/>
+
+
+      <!--  Planner Dialog (prefilled) -->
+      <Planner
+        v-if="showPlanner"
+        :initialPlaceType="plannerPlaceType"
+        :initialPlaceId="plannerPlaceId"
+        @close="showPlanner = false"
       />
 
       <!--  Toilet Info -->

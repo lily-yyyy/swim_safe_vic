@@ -12,16 +12,16 @@ const showDialog = ref(false)
 const router = useRouter()
 
 const goToSwimMap = () => router.push('/swim')
-const goToLearn = () => router.push('/learn') // ✅ NEW
+const goToLearn = () => router.push('/learn') 
 </script>
 
 <template>
   <div class="container-fluid p-0 home-view">
-    <!-- 🗓️ Planner -->
+    <!--  Planner -->
     <BaseButton label="Planner" @click="showDialog = true" />
     <Planner v-if="showDialog" @close="showDialog = false" />
 
-    <!-- 🏖️ Hero Section -->
+    <!--  Hero Section -->
     <section class="hero d-flex align-iterms-center text-center">
       <!-- background video  -->
       <video class="hero-video" :src="videoSrc" alt="background video" autoplay muted loop playsinlin></video>
@@ -40,7 +40,7 @@ const goToLearn = () => router.push('/learn') // ✅ NEW
       </div>
     </section>
 
-    <!-- 📊 Did You Know Section -->
+    <!--  Did You Know Section -->
     <section class="py-5 bg-light">
       <div class="container">
         <div class="row align-items-center">
@@ -60,7 +60,7 @@ const goToLearn = () => router.push('/learn') // ✅ NEW
       </div>
     </section>
 
-    <!-- ⚠️ Warning Section -->
+    <!--  Warning Section -->
     <section class="py-5 text-white text-center warning-banner">
       <div class="container">
         <h3 class="warning-title mb-1">
@@ -70,11 +70,11 @@ const goToLearn = () => router.push('/learn') // ✅ NEW
       </div>
     </section>
 
-    <!-- 📌 Feature Cards Section -->
+    <!--  Feature Cards Section -->
     <section class="py-5 cards-section">
       <div class="container">
         <div class="row g-4">
-          <!-- 🧠 Card 1 - Learn and Protect -->
+          <!--  Card 1 - Learn and Protect -->
           <div class="col-md-4">
             <div class="custom-card text-center">
               <div class="card-body">
@@ -89,7 +89,7 @@ const goToLearn = () => router.push('/learn') // ✅ NEW
             </div>
           </div>
 
-          <!-- 🏊‍♂️ Card 2 - Swim Safety -->
+          <!--  Card 2 - Swim Safety -->
           <div class="col-md-4">
             <div class="custom-card text-center">
               <div class="card-body">
@@ -102,7 +102,7 @@ const goToLearn = () => router.push('/learn') // ✅ NEW
             </div>
           </div>
 
-          <!-- 🚻 Card 3 - Find Amenities -->
+          <!--  Card 3 - Find Amenities -->
           <div class="col-md-4">
             <div class="custom-card text-center">
               <div class="card-body">
@@ -121,12 +121,12 @@ const goToLearn = () => router.push('/learn') // ✅ NEW
 </template>
 
 <style scoped>
-/* 🌍 Page Background */
+/*  Page Background */
 .home-view {
   background-color: #FFFFE7;
 }
 
-/* 🏖️ Hero Section */
+/*  Hero Section */
 .hero {
   position: relative;
   height: 100vh;
@@ -204,7 +204,7 @@ const goToLearn = () => router.push('/learn') // ✅ NEW
   opacity: 0.6;
 }
 
-/* ⚠️ Warning Banner */
+/*  Warning Banner */
 .warning-banner {
   background: linear-gradient(90deg, #5fd5c1 0%, #5ac1b0 100%);
   color: white;
@@ -263,7 +263,7 @@ const goToLearn = () => router.push('/learn') // ✅ NEW
   transform: scale(1.05);
 }
 
-/* 📱 Responsive */
+/*  Responsive */
 @media (max-width: 768px) {
   .text-hero-title {
     font-size: 2.8rem;

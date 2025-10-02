@@ -51,19 +51,26 @@
     </div>
 
     <!-- Actions -->
-    <div class="d-flex justify-content-between mt-3">
-      <!-- <button class="btn btn-outline-secondary btn-sm px-3">
-        Save
-      </button> -->
+    <div class="mt-3">
+      <!-- Directions -->
       <button
-        class="btn btn-primary btn-sm px-3"
-        @click="location.getDirections?.()"
+        class="btn btn-teal w-100 mb-2"
+        @click="handleDirections"
       >
-        Directions
+        <span class="me-1">📍</span> Directions
+      </button>
+
+      <!-- Planner -->
+      <button
+        class="btn btn-teal w-100"
+        @click="$emit('open-planner')"
+      >
+        <span class="me-1">🗓️</span> Planner
       </button>
     </div>
   </div>
 </template>
+
 
 <script setup>
 import { computed } from 'vue'
@@ -75,6 +82,8 @@ const props = defineProps({
     required: true,
   },
 })
+
+const emit = defineEmits(['close', 'open-planner'])
 
 // Today’s formatted date via composable
 const today = useToday()
@@ -105,6 +114,16 @@ const canSwimClass = computed(() => {
   if (s === 'action') return 'text-danger'
   return 'text-muted'
 })
+
+// Actions
+function handleDirections() {
+  props.location.getDirections?.()
+}
+
+function openPlanner() {
+  // Let parent open Planner dialog with this location
+  emit('open-planner', props.location)
+}
 </script>
 
 <style scoped>
@@ -132,5 +151,20 @@ const canSwimClass = computed(() => {
 .tip-detail {
   font-size: 0.9rem;
   line-height: 1.5;
+}
+
+/* Teal action buttons to match your Directions style */
+.btn-teal {
+  background: #007b7f;
+  color: #fff;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.btn-teal:hover {
+  background: #006c70;
+  color: #fff;
 }
 </style>

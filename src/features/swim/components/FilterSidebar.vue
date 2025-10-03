@@ -15,7 +15,7 @@ const props = defineProps({
 const filters = reactive({
   showOnMap: 'all',
   waterQuality: null,
-  distance: null, // ✅ New for distance filter
+  distance: null, 
   amenities: [],
   toiletAccessibility: null,
 })
@@ -62,7 +62,7 @@ function resetFilters() {
 
 <template>
   <div class="filter-sidebar">
-    <!-- 🔍 Search with icon -->
+    <!--  Search -->
     <div class="search-container">
       <img src="@/assets/icons/search.svg" class="search-icon" />
       <input
@@ -116,7 +116,7 @@ function resetFilters() {
       </div>
     </section>
 
-    <!-- ✅ Distance -->
+    <!--  Distance -->
     <section>
       <label>Distance</label>
       <div class="btn-group">
@@ -141,20 +141,33 @@ function resetFilters() {
       </div>
     </section>
 
-    <!--  Results section -->
+   <!-- Results -->
     <section>
       <div class="d-flex justify-content-between align-items-center mb-2">
         <label>Results</label>
         <button class="reset-btn" @click="resetFilters">Reset</button>
       </div>
 
-      <div v-for="(res, i) in props.results" :key="i" class="result-item">
-        <div class="result-header">
-          <img src="@/assets/icons/menu.svg" />
-          <strong>{{ res.name }}</strong>
+      <!--  Show result list if there are matches -->
+      <div v-if="props.results.length > 0">
+        <div v-for="(res, i) in props.results" :key="i" class="result-item">
+          <div class="result-header">
+            <img src="@/assets/icons/menu.svg" />
+            <strong>{{ res.name }}</strong>
+          </div>
+          <div :class="['status', res.status?.toLowerCase()]">{{ res.status }}</div>
+          <p>{{ res.description }}</p>
         </div>
-        <div :class="['status', res.status?.toLowerCase()]">{{ res.status }}</div>
-        <p>{{ res.description }}</p>
+      </div>
+
+      <!--  No results but search/filters applied -->
+      <div v-else-if="searchQuery || filters.showOnMap !== 'all' || filters.waterQuality || filters.distance || filters.amenities.length > 0 || filters.toiletAccessibility">
+        🚫 <strong class="no-results">No results match your filters or search.</strong>
+      </div>
+
+      <!--  Default state: nothing searched yet -->
+      <div v-else>
+        🔍 <strong class="no-results">Please search to find results.</strong>
       </div>
     </section>
   </div>
@@ -329,6 +342,15 @@ label {
   cursor: pointer;
   font-size: 13px;
   transition: background 0.2s;
+}
+.no-results {
+  text-align: center;
+  font-weight: bold;
+  font-size: 14px;
+  margin-top: 12px;
+  padding: 10px;
+  border-radius: 6px;
+  color: #007b7f; 
 }
 
 .reset-btn:hover {

@@ -28,13 +28,13 @@ import { getAllRivers } from '@/api/webapi/river_api'
 import { createNotification } from '@/api/webapi/notification_api'
 import { searchUserByEmail, createUser } from '@/api/webapi/user_api'
 
-// 🔹 Props to receive preselected values from InfoDialog/SwimView
+//  Props to receive preselected values from InfoDialog/SwimView
 const props = defineProps({
   initialPlaceType: { type: String, default: 'beach' }, // "beach" | "river"
   initialPlaceId: { type: [String, Number], default: '' }
 })
 
-// 🔹 Tell parent when to unmount
+//  Tell parent when to unmount
 const emit = defineEmits(['close'])
 
 const showDialog = ref(true)

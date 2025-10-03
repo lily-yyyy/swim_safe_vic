@@ -15,7 +15,7 @@ const props = defineProps({
 const filters = reactive({
   showOnMap: 'all',
   waterQuality: null,
-  distance: null,
+  distance: null, // ✅ New for distance filter
   amenities: [],
   toiletAccessibility: null,
 })
@@ -116,15 +116,15 @@ function resetFilters() {
       </div>
     </section>
 
-    <!-- Distance -->
-    <!-- <section>
+    <!-- ✅ Distance -->
+    <section>
       <label>Distance</label>
       <div class="btn-group">
-        <button class="btn" :class="{ active: filters.distance === '1km' }" @click="setFilter('distance', '1km')">1km</button>
-        <button class="btn" :class="{ active: filters.distance === '5km' }" @click="setFilter('distance', '5km')">5km</button>
-        <button class="btn" :class="{ active: filters.distance === '10km' }" @click="setFilter('distance', '10km')">10km</button>
+        <button class="btn" :class="{ active: filters.distance === '1' }" @click="setFilter('distance', '1')">1 km</button>
+        <button class="btn" :class="{ active: filters.distance === '5' }" @click="setFilter('distance', '5')">5 km</button>
+        <button class="btn" :class="{ active: filters.distance === '10' }" @click="setFilter('distance', '10')">10 km</button>
       </div>
-    </section> -->
+    </section>
 
     <!-- Amenities -->
     <section>
@@ -141,21 +141,10 @@ function resetFilters() {
       </div>
     </section>
 
-    <!-- Toilet Accessibility -->
-    <!-- <section>
-      <label>Toilet Accessibility</label>
-      <div class="btn-group">
-        <button class="btn" :class="{ active: filters.toiletAccessibility === 'female' }" @click="setFilter('toiletAccessibility', 'female')">Female</button>
-        <button class="btn" :class="{ active: filters.toiletAccessibility === 'male' }" @click="setFilter('toiletAccessibility', 'male')">Male</button>
-        <button class="btn" :class="{ active: filters.toiletAccessibility === 'all' }" @click="setFilter('toiletAccessibility', 'all')">All Gender</button>
-      </div>
-    </section> -->
-
     <!--  Results section -->
     <section>
       <div class="d-flex justify-content-between align-items-center mb-2">
         <label>Results</label>
-        <!-- 🔹 Reset Button -->
         <button class="reset-btn" @click="resetFilters">Reset</button>
       </div>
 

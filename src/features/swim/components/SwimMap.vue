@@ -179,32 +179,80 @@ function getStatusColorIcon(status) {
   }
 }
 
+
+function getDistanceKm(lat1, lon1, lat2, lon2) {
+  const R = 6371; // Earth radius in km
+  const dLat = (lat2 - lat1) * Math.PI / 180
+  const dLon = (lon2 - lon1) * Math.PI / 180
+  const a =
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon/2) * Math.sin(dLon/2)
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+  return R * c
+}
+
+
 // Filter markers
+// const filteredLocations = computed(() => {
+//   const show = props.filters?.showOnMap || 'all'
+//   const quality = props.filters?.waterQuality
+//   const query = props.searchQuery?.toLowerCase().trim() || ''
+
+//   let data = []
+
+//   if (show === 'all' || show === 'beach') data.push(...allBeaches.value)
+//   if (show === 'all' || show === 'river') data.push(...allRivers.value)
+
+//   if (quality) {
+//     const statusMap = {
+//       safe: 'Surveillance',
+//       caution: 'Alert',
+//       unsafe: 'Action'
+//     }
+//     data = data.filter(loc => loc.status === statusMap[quality])
+//   }
+
+//   if (query) {
+//     data = data.filter(loc => loc.name?.toLowerCase().includes(query))
+//   }
+
+//   return data
+// })
+
 const filteredLocations = computed(() => {
   const show = props.filters?.showOnMap || 'all'
   const quality = props.filters?.waterQuality
   const query = props.searchQuery?.toLowerCase().trim() || ''
+  const distance = props.filters?.distance ? parseFloat(props.filters.distance) : null
 
   let data = []
 
   if (show === 'all' || show === 'beach') data.push(...allBeaches.value)
   if (show === 'all' || show === 'river') data.push(...allRivers.value)
 
+  //  Quality filter
   if (quality) {
-    const statusMap = {
-      safe: 'Surveillance',
-      caution: 'Alert',
-      unsafe: 'Action'
-    }
+    const statusMap = { safe: 'Surveillance', caution: 'Alert', unsafe: 'Action' }
     data = data.filter(loc => loc.status === statusMap[quality])
   }
 
+  //  Search filter
   if (query) {
     data = data.filter(loc => loc.name?.toLowerCase().includes(query))
   }
 
+  //  Distance filter (only if user location available)
+  if (distance && userLocation.value) {
+    data = data.filter(loc => {
+      const d = getDistanceKm(userLocation.value.lat, userLocation.value.lng, loc.lat, loc.lon)
+      return d <= distance
+    })
+  }
+
   return data
 })
+
 
 // Handle marker click
 async function handleMarkerClick(location) {

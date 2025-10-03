@@ -115,9 +115,19 @@ const canSwimClass = computed(() => {
   return 'text-muted'
 })
 
-// Actions
+// Directions with Google Maps
+
+//old method for in map direction
+// function handleDirections() { props.location.getDirections?.() }
+
+//Redirection google map direction
 function handleDirections() {
-  props.location.getDirections?.()
+  if (props.location.lat && props.location.lon) {
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${props.location.lat},${props.location.lon}&destination_place_id=${props.location.id || ''}`
+    window.open(url, '_blank')  // open in new tab
+  } else {
+    alert('No coordinates available for this location.')
+  }
 }
 
 function openPlanner() {
@@ -125,6 +135,7 @@ function openPlanner() {
   emit('open-planner', props.location)
 }
 </script>
+
 
 <style scoped>
 .info-dialog {

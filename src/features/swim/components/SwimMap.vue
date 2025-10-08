@@ -142,12 +142,21 @@ onMounted(async () => {
     })
 
     allRivers.value = rivers.map(river => {
-      const totalN = Number(river.total_nitrogen_mg_l ?? NaN)
-      const status = Number.isFinite(totalN) ? getRiverStatus(totalN) : 'Surveillance'
+      const predicted = river.predicted || {}
+      const status = river?.predicted?.category ?? 'Poor'
+      const wqi = river.predicted?.wqi ?? null
+
+       console.log('River:', river.name, {
+        predictedCategory: river?.predicted?.category,
+        wqi: river?.predicted?.wqi,
+        rawPredicted: river?.predicted
+      })
+      
       return {
         ...river,
         type: 'river',
-        status,
+        status, // "Excellent" | "Good" | "Moderate" | "Poor" | "Very Poor",
+        wqi,
         icon: getStatusColorIcon(status),
         description: river.description || 'No description available.'
       }
@@ -159,22 +168,27 @@ onMounted(async () => {
 
 // Status logic
 function getBeachStatus(enterococci) {
-  if (enterococci <= 140) return 'Surveillance'
-  if (enterococci <= 280) return 'Alert'
+  if (enterococci <= 140) return 'Good'
+  if (enterococci <= 280) return 'Very Poor'
   return 'Action'
 }
 
-function getRiverStatus(totalN) {
-  if (totalN <= 0.1) return 'Surveillance'
-  if (totalN <= 0.75) return 'Alert'
-  return 'Action'
-}
+// function getRiverStatus(totalN) {
+//   if (totalN <= 0.1) return 'Surveillance'
+//   if (totalN <= 0.75) return 'Alert'
+//   return 'Action'
+// }
 
 function getStatusColorIcon(status) {
   switch (status) {
-    case 'Surveillance': return 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'
-    case 'Alert': return 'http://maps.google.com/mapfiles/ms/icons/orange-dot.png'
-    case 'Action': return 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
+    // case 'Surveillance': return 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'
+    // case 'Alert': return 'http://maps.google.com/mapfiles/ms/icons/orange-dot.png'
+    // case 'Action': return 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
+    case 'Excellent': return 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'
+    case 'Good': return 'http://maps.google.com/mapfiles/ms/icons/ltblue-dot.png'
+    case 'Moderate': return 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png'
+    case 'Poor': return 'http://maps.google.com/mapfiles/ms/icons/orange-dot.png'
+    case 'Very Poor': return 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
     default: return ''
   }
 }

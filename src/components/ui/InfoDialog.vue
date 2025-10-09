@@ -63,7 +63,7 @@
       <!-- Planner -->
       <button
         class="btn btn-teal w-100"
-        @click="$emit('open-planner')"
+        @click="openPlanner"
       >
         <span class="me-1">🗓️</span> Planner
       </button>

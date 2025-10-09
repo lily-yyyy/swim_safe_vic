@@ -1,7 +1,10 @@
 <template>
-  <div class="calendar-dialog-backdrop" @click="handleBackdropClick">
+  <div
+    class="calendar-dialog-backdrop"
+    data-testid="calendar-backdrop"
+    @click="handleBackdropClick"
+  >
     <div class="calendar-dialog shadow bg-white rounded" @click.stop>
-      
       <!-- Header -->
       <div class="dialog-header d-flex justify-content-between align-items-start">
         <div class="dialog-title">
@@ -15,11 +18,11 @@
 
       <!-- Body -->
       <div class="dialog-body">
-
-        <!-- Email Input (only for first-time users) -->
+        <!-- Email Input -->
         <div v-if="showEmailInput">
-          <label class="form-label fw-semibold">Email</label>
+          <label for="email" class="form-label fw-semibold">Email</label>
           <input
+            id="email"
             type="email"
             class="form-control mb-3"
             :value="userEmail"
@@ -30,8 +33,9 @@
         </div>
 
         <!-- Date -->
-        <label class="form-label fw-semibold">Date</label>
+        <label for="date" class="form-label fw-semibold">Date</label>
         <input
+          id="date"
           type="date"
           class="form-control mb-3"
           :value="selectedDate"
@@ -40,8 +44,9 @@
         />
 
         <!-- Time -->
-        <label class="form-label fw-semibold">Time</label>
+        <label for="time" class="form-label fw-semibold">Time</label>
         <input
+          id="time"
           type="time"
           class="form-control mb-3"
           :value="selectedTime"
@@ -49,8 +54,9 @@
         />
 
         <!-- Place Type -->
-        <label class="form-label fw-semibold">Place Type</label>
+        <label for="place-type" class="form-label fw-semibold">Place Type</label>
         <select
+          id="place-type"
           class="form-select mb-3"
           :value="placeType"
           @change="$emit('update:place-type', $event.target.value)"
@@ -61,8 +67,9 @@
         </select>
 
         <!-- Location -->
-        <label class="form-label fw-semibold">Location</label>
+        <label for="location" class="form-label fw-semibold">Location</label>
         <select
+          id="location"
           class="form-select mb-3"
           :value="selectedPlaceId"
           :disabled="!places.length"
@@ -85,10 +92,10 @@
           Submit
         </button>
       </div>
-
     </div>
   </div>
 </template>
+
 
 <script setup>
 import { computed } from 'vue'

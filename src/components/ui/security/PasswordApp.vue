@@ -16,7 +16,7 @@
 <script setup>
 import { ref } from 'vue'
 
-// 🔐 Change this to your actual password
+
 const correctPassword = 'm123'
 
 const input = ref('')

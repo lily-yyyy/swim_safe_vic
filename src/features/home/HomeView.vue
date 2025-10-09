@@ -13,6 +13,12 @@ const router = useRouter()
 
 const goToSwimMap = () => router.push('/swim')
 const goToLearn = () => router.push('/learn') 
+
+const scrollToNextSection = () => {
+  // Scroll to the next section (Did You Know)
+  const nextSection = document.querySelector('.py-5.bg-light')
+  nextSection?.scrollIntoView({ behavior: 'smooth' })
+}
 </script>
 
 <template>
@@ -28,17 +34,22 @@ const goToLearn = () => router.push('/learn')
       <div class="hero-overlay"></div>
       <div class="container hero-content-wrapper">
         <div class="hero-content">
-          <h1 class="display-2 fw-bold text-hero-title">Safe Water</h1>
-          <p class="lead mb-4 text-hero-subtitle">Plan, check, and enjoy the clean water</p>
+          <h1 class="display-2 fw-bold text-hero-title">MELBOURNE CLEAN WATER</h1>
+          <p class="lead mb-4 text-hero-subtitle">Monitoring water quality for swimming</p>
         </div>
 
         <!-- Hero CTA --> 
         <!-- Hero CTA -->
         <button class="hero-button" @click="goToSwimMap">
-          Explore Water Map
+          Click to Explore
         </button>
       </div>
     </section>
+
+    <div class="scroll-hint" @click="scrollToNextSection">
+      <span class="arrow">↓</span>
+      <span class="text">Scroll Down</span>
+    </div>
 
     <!--  Did You Know Section -->
     <section class="py-5 bg-light">
@@ -78,7 +89,7 @@ const goToLearn = () => router.push('/learn')
           <div class="col-md-4">
             <div class="custom-card text-center">
               <div class="card-body">
-                <h5 class="card-title fw-bold mb-4">Learn and Protect</h5>
+                <h5 class="card-title fw-bold mb-4">Step 1: Learn with us</h5>
                 <div class="d-grid gap-3">
                   <BaseButton label="Water Metrics" variant="primary" @click="goToLearn" />
                   <BaseButton label="How we measure water quality" variant="primary" @click="goToLearn" />
@@ -93,7 +104,7 @@ const goToLearn = () => router.push('/learn')
           <div class="col-md-4">
             <div class="custom-card text-center">
               <div class="card-body">
-                <h5 class="card-title fw-bold mb-3">Real-Time Swim Safety</h5>
+                <h5 class="card-title fw-bold mb-3">Step 2: Check water quality</h5>
                 <p class="card-text mb-4">
                   Interactive map showing real-time safety indicators for beaches and rivers.
                 </p>
@@ -106,7 +117,7 @@ const goToLearn = () => router.push('/learn')
           <div class="col-md-4">
             <div class="custom-card text-center">
               <div class="card-body">
-                <h5 class="card-title fw-bold mb-3">Find Amenities</h5>
+                <h5 class="card-title fw-bold mb-3">Step 3: Find Amenities and rate</h5>
                 <p class="card-text mb-4">
                   Locate public toilets and water fountains with recent cleanliness reports.
                 </p>
@@ -121,6 +132,43 @@ const goToLearn = () => router.push('/learn')
 </template>
 
 <style scoped>
+.scroll-hint {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: pointer;
+  text-align: center;
+  color: white;
+  font-weight: 500;
+  z-index: 10;
+  user-select: none;
+}
+
+.scroll-hint .arrow {
+  font-size: 2rem;
+  display: block;
+  animation: bounce 1.5s infinite;
+}
+
+.scroll-hint .text {
+  font-size: 0.9rem;
+  margin-top: 5px;
+}
+
+/* Bounce Animation */
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(8px);
+  }
+  60% {
+    transform: translateY(4px);
+  }
+}
+
 /*  Page Background */
 .home-view {
   background-color: #FFFFE7;
@@ -193,8 +241,8 @@ const goToLearn = () => router.push('/learn')
   border: none;
   cursor: pointer; 
   color: #504c4c; 
-  font-size: 1rem;
-  font-weight: bold;
+  font-size: 1.3rem;
+  font-weight: semi-bold;
   padding-top: 30px;
   margin-top: 50px;
 }

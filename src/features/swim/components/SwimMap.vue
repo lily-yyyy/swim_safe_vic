@@ -200,12 +200,12 @@ onMounted(async () => {
         statusLabel = 'Avoid Swimming'
       }
       
-      console.log('Beach:', beach.name, {
-        enterococci: enterococci,
-        mlCategory: mlCategory,
-        status: status,
-        timestamp: prediction.timestamp
-      })
+      // console.log('Beach:', beach.name, {
+      //   enterococci: enterococci,
+      //   mlCategory: mlCategory,
+      //   status: status,
+      //   timestamp: prediction.timestamp
+      // })
       
       return {
         ...beach,
@@ -233,11 +233,11 @@ onMounted(async () => {
       const status = predicted.category || 'Poor'
       const wqi = predicted.wqi ?? null
 
-      console.log('River:', river.name, {
-        predictedCategory: predicted.category,
-        wqi: wqi,
-        rawPredicted: predicted
-      })
+      // console.log('River:', river.name, {
+      //   predictedCategory: predicted.category,
+      //   wqi: wqi,
+      //   rawPredicted: predicted
+      // })
       
       return {
         ...river,

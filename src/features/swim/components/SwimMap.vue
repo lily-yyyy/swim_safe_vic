@@ -27,7 +27,7 @@ const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
 const mapId = import.meta.env.VITE_GOOGLE_MAP_ID || ''
 
 // Refs
-const center = ref({ lat: -37.8679, lng: 144.9740 }) // Default Melbourne center
+const center = ref({ lat: -37.8679, lng: 144.9740 })
 const mapRef = ref(null)
 
 const allBeaches = ref([])
@@ -109,7 +109,7 @@ watch(
   { immediate: true }
 )
 
-// Optional: Pre-fetch user location on load
+// Pre-fetch user location on load
 onMounted(() => {
   fetchUserLocation().catch(() => {
     console.warn('User denied geolocation or it failed.')
@@ -175,25 +175,34 @@ watch(() => props.zoomTarget, (target) => {
   }
 })
 
-// Load beach & river data
+// ===== FIXED: Load beach & river data =====
 onMounted(async () => {
   try {
     const beaches = await getAllBeaches()
     const rivers = await getAllRivers()
 
-    // ===== BEACHES: Use ML predictions =====
+    // ===== BEACHES: Use ML predictions with CORRECT thresholds =====
     allBeaches.value = beaches.map(beach => {
-      // Get prediction data (falls back to measured if no prediction)
       const prediction = beach.predicted || {}
       const enterococci = prediction.enterococci || beach.avg_enterococci || 0
-      const category = prediction.category // 'green', 'amber', 'red'
+      const mlCategory = prediction.category // 'green', 'amber', 'red'
       
-      // Convert ML category to your status system
-      const status = getBeachStatusFromML(category, enterococci)
+      // ✅ FIXED: Use unified status system
+      let status, statusLabel
+      if (mlCategory === 'green' || enterococci <= 40) {
+        status = 'Excellent'
+        statusLabel = 'Safe for Swimming'
+      } else if (mlCategory === 'amber' || enterococci <= 200) {
+        status = 'Moderate'
+        statusLabel = 'Caution Advised'
+      } else {
+        status = 'Poor'
+        statusLabel = 'Avoid Swimming'
+      }
       
       console.log('Beach:', beach.name, {
         enterococci: enterococci,
-        mlCategory: category,
+        mlCategory: mlCategory,
         status: status,
         timestamp: prediction.timestamp
       })
@@ -201,26 +210,33 @@ onMounted(async () => {
       return {
         ...beach,
         type: 'beach',
-        status, // 'Good' | 'Very Poor' | 'Action'
-        enterococci, // The actual value to display
-        category, // ML category ('green', 'amber', 'red')
+        status, // ✅ Now: 'Excellent' | 'Moderate' | 'Poor'
+        statusLabel,
+        enterococci,
+        mlCategory,
         rainfall_mm: prediction.rainfall_mm || 0,
         prediction_timestamp: prediction.timestamp,
         icon: getStatusColorIcon(status),
-        description: beach.description_tips || 'No description available.'
+        description: beach.description_tips || 'No description available.',
+        // Extra data for detail view
+        extraInfo: {
+          rainfallLast3Days: prediction.rainfall_mm || 0,
+          lastUpdated: formatTimestamp(prediction.timestamp),
+          dataSource: prediction.enterococci ? 'ML Prediction' : 'Historical Average'
+        }
       }
     })
 
     // ===== RIVERS: Keep existing logic =====
     allRivers.value = rivers.map(river => {
       const predicted = river.predicted || {}
-      const status = river?.predicted?.category ?? 'Poor'
-      const wqi = river.predicted?.wqi ?? null
+      const status = predicted.category || 'Poor'
+      const wqi = predicted.wqi ?? null
 
       console.log('River:', river.name, {
-        predictedCategory: river?.predicted?.category,
-        wqi: river?.predicted?.wqi,
-        rawPredicted: river?.predicted
+        predictedCategory: predicted.category,
+        wqi: wqi,
+        rawPredicted: predicted
       })
       
       return {
@@ -239,43 +255,38 @@ onMounted(async () => {
 })
 
 
-// ===== NEW: Convert ML category to your status system =====
-function getBeachStatusFromML(mlCategory, enterococci) {
-  // Option 1: Use ML category directly
-  if (mlCategory === 'green') return 'Good'
-  if (mlCategory === 'amber') return 'Very Poor'
-  if (mlCategory === 'red') return 'Action'
-  
-  // Option 2: Fall back to enterococci value if no ML prediction
-  return getBeachStatus(enterococci)
-}
-
-
-// Status logic
-function getBeachStatus(enterococci) {
-  if (enterococci <= 140) return 'Good'
-  if (enterococci <= 280) return 'Very Poor'
-  return 'Action'
-}
-
-// function getRiverStatus(totalN) {
-//   if (totalN <= 0.1) return 'Surveillance'
-//   if (totalN <= 0.75) return 'Alert'
-//   return 'Action'
-// }
-
+// ===== FIXED: Icon mapping (unified for both beaches and rivers) =====
 function getStatusColorIcon(status) {
-  switch (status) {
-    case 'Excellent': return 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'
-    case 'Good': return 'http://maps.google.com/mapfiles/ms/icons/ltblue-dot.png'
-    case 'Moderate': return 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png'
-    case 'Poor': return 'http://maps.google.com/mapfiles/ms/icons/orange-dot.png'
-    case 'Very Poor': return 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
-    default: return ''
+  const icons = {
+    'Excellent': 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
+    'Good': 'http://maps.google.com/mapfiles/ms/icons/ltblue-dot.png',
+    'Moderate': 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png',
+    'Poor': 'http://maps.google.com/mapfiles/ms/icons/orange-dot.png',
+    'Very Poor': 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
   }
+  return icons[status] || 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
 }
 
 
+// ===== NEW: Time formatting helper =====
+function formatTimestamp(timestamp) {
+  if (!timestamp) return 'Unknown'
+  const date = new Date(timestamp)
+  const now = new Date()
+  const diffMs = now - date
+  const diffMins = Math.floor(diffMs / 60000)
+  const diffHours = Math.floor(diffMins / 60)
+  
+  if (diffMins < 60) return `${diffMins} minutes ago`
+  if (diffHours < 24) return `${diffHours} hours ago`
+  const days = Math.floor(diffHours / 24)
+  if (days === 1) return 'yesterday'
+  if (days < 7) return `${days} days ago`
+  return date.toLocaleDateString()
+}
+
+
+// ===== Helper: Calculate distance =====
 function getDistanceKm(lat1, lon1, lat2, lon2) {
   const R = 6371; // Earth radius in km
   const dLat = (lat2 - lat1) * Math.PI / 180
@@ -289,33 +300,7 @@ function getDistanceKm(lat1, lon1, lat2, lon2) {
 }
 
 
-// Filter markers
-// const filteredLocations = computed(() => {
-//   const show = props.filters?.showOnMap || 'all'
-//   const quality = props.filters?.waterQuality
-//   const query = props.searchQuery?.toLowerCase().trim() || ''
-
-//   let data = []
-
-//   if (show === 'all' || show === 'beach') data.push(...allBeaches.value)
-//   if (show === 'all' || show === 'river') data.push(...allRivers.value)
-
-//   if (quality) {
-//     const statusMap = {
-//       safe: 'Surveillance',
-//       caution: 'Alert',
-//       unsafe: 'Action'
-//     }
-//     data = data.filter(loc => loc.status === statusMap[quality])
-//   }
-
-//   if (query) {
-//     data = data.filter(loc => loc.name?.toLowerCase().includes(query))
-//   }
-
-//   return data
-// })
-
+// ===== FIXED: Filter markers with correct status mapping =====
 const filteredLocations = computed(() => {
   const show = props.filters?.showOnMap || 'all'
   const quality = props.filters?.waterQuality
@@ -327,18 +312,23 @@ const filteredLocations = computed(() => {
   if (show === 'all' || show === 'beach') data.push(...allBeaches.value)
   if (show === 'all' || show === 'river') data.push(...allRivers.value)
 
-  //  Quality filter
+  // ✅ FIXED: Quality filter with unified status names
   if (quality) {
-    const statusMap = { safe: 'Surveillance', caution: 'Alert', unsafe: 'Action' }
-    data = data.filter(loc => loc.status === statusMap[quality])
+    const statusMap = {
+      safe: ['Excellent', 'Good'],     // ✅ Green pins
+      caution: ['Moderate'],           // ✅ Yellow/Orange pins
+      unsafe: ['Poor', 'Very Poor']    // ✅ Red pins
+    }
+    const targetStatuses = statusMap[quality] || []
+    data = data.filter(loc => targetStatuses.includes(loc.status))
   }
 
-  //  Search filter
+  // Search filter
   if (query) {
     data = data.filter(loc => loc.name?.toLowerCase().includes(query))
   }
 
-  //  Distance filter (only if user location available)
+  // Distance filter (only if user location available)
   if (distance && userLocation.value) {
     data = data.filter(loc => {
       const d = getDistanceKm(userLocation.value.lat, userLocation.value.lng, loc.lat, loc.lon)
@@ -395,7 +385,7 @@ async function handleMarkerClick(location) {
       <!-- Beach & River Markers -->
       <Marker
         v-for="(loc, i) in filteredLocations"
-        :key="i"
+        :key="`${loc.type}-${loc.beach_id || loc.river_id || i}`"
         :options="{
           position: { lat: loc.lat, lng: loc.lon },
           title: `${loc.name} (${loc.status})`,
@@ -404,13 +394,13 @@ async function handleMarkerClick(location) {
         @click="handleMarkerClick(loc)"
       />
 
-      <!--  Toilets -->
+      <!-- Toilets -->
       <ToiletMarkers
         v-if="filters?.amenities?.includes('toilets')"
         @marker-clicked="handleMarkerClick"
       />
 
-      <!--  Fountains -->
+      <!-- Fountains -->
       <FountainMarkers
         v-if="filters?.amenities?.includes('fountains')"
         @marker-clicked="handleMarkerClick"

@@ -131,11 +131,11 @@ function resetFilters() {
       <label>Amenities</label>
       <div class="btn-group">
         <button class="btn" :class="{ active: filters.amenities.includes('toilets') }" @click="toggleAmenity('toilets')">
-          <img src="@/assets/icons/toilet1.png" />
+          <img src="@/assets/icons/toilet3.png" />
           Toilets
         </button>
         <button class="btn" :class="{ active: filters.amenities.includes('fountains') }" @click="toggleAmenity('fountains')">
-          <img src="@/assets/icons/fountains.svg" />
+          <img src="@/assets/icons/fountains3.png" />
           Fountains
         </button>
       </div>

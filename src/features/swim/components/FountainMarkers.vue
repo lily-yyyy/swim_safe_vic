@@ -14,7 +14,7 @@ onMounted(async () => {
 
     let iconPath
     try {
-      iconPath = new URL('@/assets/icons/fountains.svg', import.meta.url).href
+      iconPath = new URL('@/assets/icons/fountains3.png', import.meta.url).href
       console.log('🖼️ Fountain icon path resolved:', iconPath)
     } catch (e) {
       

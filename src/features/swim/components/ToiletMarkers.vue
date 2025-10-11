@@ -11,7 +11,7 @@ onMounted(async () => {
     const data = await getToilets()
     toilets.value = data.map(t => ({
       ...t,
-      icon: new URL('@/assets/icons/toilet1.png', import.meta.url).href
+      icon: new URL('@/assets/icons/toilet3.png', import.meta.url).href
     }))
   } catch (err) {
     console.error('Failed to load toilets:', err)

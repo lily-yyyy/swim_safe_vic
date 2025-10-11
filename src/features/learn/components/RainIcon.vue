@@ -1,7 +1,8 @@
 <template>
-  <div class="text-center">
+  <div class="text-center" data-testid="rain-icon">
     <img :src="iconUrl" width="40" height="40" class="mb-2" />
     <div class="small fw-medium">{{ label }}</div>
+    
   </div>
 </template>
 

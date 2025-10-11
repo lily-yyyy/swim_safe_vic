@@ -1,5 +1,5 @@
 <template>
-  <div class="col-md-4">
+  <div class="col-md-4" data-testid="protect-card">
     <div class="card h-100 text-center shadow-sm">
       <div class="card-body">
         <img :src="iconUrl" width="40" height="40" class="mb-3" />

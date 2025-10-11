@@ -181,23 +181,43 @@ onMounted(async () => {
     const beaches = await getAllBeaches()
     const rivers = await getAllRivers()
 
+    // ===== BEACHES: Use ML predictions =====
     allBeaches.value = beaches.map(beach => {
-      const status = getBeachStatus(beach.avg_enterococci)
+      // Get prediction data (falls back to measured if no prediction)
+      const prediction = beach.predicted || {}
+      const enterococci = prediction.enterococci || beach.avg_enterococci || 0
+      const category = prediction.category // 'green', 'amber', 'red'
+      
+      // Convert ML category to your status system
+      const status = getBeachStatusFromML(category, enterococci)
+      
+      console.log('Beach:', beach.name, {
+        enterococci: enterococci,
+        mlCategory: category,
+        status: status,
+        timestamp: prediction.timestamp
+      })
+      
       return {
         ...beach,
         type: 'beach',
-        status,
+        status, // 'Good' | 'Very Poor' | 'Action'
+        enterococci, // The actual value to display
+        category, // ML category ('green', 'amber', 'red')
+        rainfall_mm: prediction.rainfall_mm || 0,
+        prediction_timestamp: prediction.timestamp,
         icon: getStatusColorIcon(status),
         description: beach.description_tips || 'No description available.'
       }
     })
 
+    // ===== RIVERS: Keep existing logic =====
     allRivers.value = rivers.map(river => {
       const predicted = river.predicted || {}
       const status = river?.predicted?.category ?? 'Poor'
       const wqi = river.predicted?.wqi ?? null
 
-       console.log('River:', river.name, {
+      console.log('River:', river.name, {
         predictedCategory: river?.predicted?.category,
         wqi: river?.predicted?.wqi,
         rawPredicted: river?.predicted
@@ -206,16 +226,30 @@ onMounted(async () => {
       return {
         ...river,
         type: 'river',
-        status, // "Excellent" | "Good" | "Moderate" | "Poor" | "Very Poor",
+        status, // "Excellent" | "Good" | "Moderate" | "Poor" | "Very Poor"
         wqi,
         icon: getStatusColorIcon(status),
         description: river.description || 'No description available.'
       }
     })
+    
   } catch (err) {
     console.error('Error loading data:', err)
   }
 })
+
+
+// ===== NEW: Convert ML category to your status system =====
+function getBeachStatusFromML(mlCategory, enterococci) {
+  // Option 1: Use ML category directly
+  if (mlCategory === 'green') return 'Good'
+  if (mlCategory === 'amber') return 'Very Poor'
+  if (mlCategory === 'red') return 'Action'
+  
+  // Option 2: Fall back to enterococci value if no ML prediction
+  return getBeachStatus(enterococci)
+}
+
 
 // Status logic
 function getBeachStatus(enterococci) {
@@ -232,9 +266,6 @@ function getBeachStatus(enterococci) {
 
 function getStatusColorIcon(status) {
   switch (status) {
-    // case 'Surveillance': return 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'
-    // case 'Alert': return 'http://maps.google.com/mapfiles/ms/icons/orange-dot.png'
-    // case 'Action': return 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
     case 'Excellent': return 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'
     case 'Good': return 'http://maps.google.com/mapfiles/ms/icons/ltblue-dot.png'
     case 'Moderate': return 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png'

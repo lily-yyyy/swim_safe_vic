@@ -110,9 +110,9 @@ function resetFilters() {
     <section>
       <label>Water Quality</label>
       <div class="btn-group">
-        <button class="btn" :class="{ active: filters.waterQuality === 'safe' }" @click="setFilter('waterQuality', 'safe')">Safe</button>
-        <button class="btn" :class="{ active: filters.waterQuality === 'caution' }" @click="setFilter('waterQuality', 'caution')">Caution</button>
-        <button class="btn" :class="{ active: filters.waterQuality === 'unsafe' }" @click="setFilter('waterQuality', 'unsafe')">Unsafe</button>
+        <button class="btn" :class="{ active: filters.waterQuality === 'clean' }" @click="setFilter('waterQuality', 'clean')">Clean</button>
+        <button class="btn" :class="{ active: filters.waterQuality === 'moderate' }" @click="setFilter('waterQuality', 'moderate')">Moderate</button>
+        <button class="btn" :class="{ active: filters.waterQuality === 'unclean' }" @click="setFilter('waterQuality', 'unclean')">Unclean</button>
       </div>
     </section>
 
@@ -317,17 +317,17 @@ label {
   margin-bottom: 6px;
 }
 
-.status.safe {
+.status.clean {
   background: #d4edda;
   color: #155724;
 }
 
-.status.unsafe {
+.status.unclean {
   background: #f8d7da;
   color: #721c24;
 }
 
-.status.caution {
+.status.moderate {
   background: #fff3cd;
   color: #856404;
 }

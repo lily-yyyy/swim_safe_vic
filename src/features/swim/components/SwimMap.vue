@@ -358,7 +358,7 @@ onMounted(async () => {
       let status, statusLabel
       if (mlCategory === 'green' || enterococci <= 40) {
         status = 'Excellent'
-        statusLabel = 'Safe for Swimming'
+        statusLabel = 'Clean for Swimming'
       } else if (mlCategory === 'amber' || enterococci <= 200) {
         status = 'Moderate'
         statusLabel = 'Caution Advised'
@@ -483,9 +483,9 @@ const filteredLocations = computed(() => {
   // ✅ FIXED: Quality filter with unified status names
   if (quality) {
     const statusMap = {
-      safe: ['Excellent', 'Good'],     // ✅ Green pins
-      caution: ['Moderate'],           // ✅ Yellow/Orange pins
-      unsafe: ['Poor', 'Very Poor']    // ✅ Red pins
+      clean: ['Excellent', 'Good'],     // ✅ Green pins
+      moderate: ['Moderate'],           // ✅ Yellow/Orange pins
+      unclean: ['Poor', 'Very Poor']    // ✅ Red pins
     }
     const targetStatuses = statusMap[quality] || []
     data = data.filter(loc => targetStatuses.includes(loc.status))

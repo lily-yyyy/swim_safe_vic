@@ -66,16 +66,6 @@
           </div>
         </div>
 
-        <!-- Water Quality Score -->
-        <div class="metric-card metric-highlight" v-if="waterQualityValue">
-          <div class="metric-icon">💧</div>
-          <div class="metric-content">
-            <div class="metric-label">Water Quality</div>
-            <div class="metric-value">{{ waterQualityValue }}</div>
-            <div class="metric-sublabel">{{ waterQualityUnit }}</div>
-          </div>
-        </div>
-
         <!-- Beach: Enterococci -->
         <div 
           class="metric-card metric-primary" 
@@ -129,11 +119,37 @@
         </div>
       </div>
 
-      <!-- Safety Threshold Info -->
+      <!-- Safety Threshold Info for Beach -->
       <div v-if="location.type === 'beach' && location.enterococci" class="threshold-info">
         <small class="text-muted">
           ℹ️ Safe threshold: ≤ 40 orgs/100mL
         </small>
+      </div>
+
+      <!-- Water Quality Threshold Info for River -->
+      <div v-if="location.type === 'river' && location.wqi" class="threshold-info">
+        <div class="threshold-grid">
+          <div class="threshold-item">
+            <span class="threshold-status excellent">✅ Excellent</span>
+            <span class="threshold-range">WQI ≥ 80</span>
+          </div>
+          <div class="threshold-item">
+            <span class="threshold-status good">🟢 Good</span>
+            <span class="threshold-range">60-79</span>
+          </div>
+          <div class="threshold-item">
+            <span class="threshold-status moderate">⚠️ Moderate</span>
+            <span class="threshold-range">40-59</span>
+          </div>
+          <div class="threshold-item">
+            <span class="threshold-status poor">🔴 Poor</span>
+            <span class="threshold-range">20-39</span>
+          </div>
+          <div class="threshold-item">
+            <span class="threshold-status very-poor">❌ Very Poor</span>
+            <span class="threshold-range">< 20</span>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -166,11 +182,6 @@
     </div>
 
     <hr class="divider" />
-
-    <!-- ========== SECTION 4: Description (Optional) ========== -->
-    <div v-if="location.description" class="description-section">
-      <p class="description-text">{{ location.description }}</p>
-    </div>
 
     <!-- ========== SECTION 5: Action Buttons ========== -->
     <div class="action-section">
@@ -303,20 +314,20 @@ const statusLabel = computed(() => {
 const swimMessage = computed(() => {
   const s = props.location.status?.toLowerCase()
   
-  if (s === 'excellent' || s === 'surveillance') return 'Safe for swimming'
-  if (s === 'good') return 'Good conditions for swimming'
+  if (s === 'excellent' || s === 'surveillance') return 'Suggested water quality for water activity'
+  if (s === 'good') return 'Good conditions for water activity'
   if (s === 'moderate' || s === 'alert') return 'Swim with caution - not recommended for sensitive groups'
-  if (s === 'poor' || s === 'action') return 'Not safe for swimming - avoid water contact'
-  if (s === 'very poor') return 'Dangerous - do not swim'
+  if (s === 'poor' || s === 'action') return 'Not clean for water activity - avoid water contact'
+  if (s === 'very poor') return 'Dangerous - do not get into water'
   
   return 'Water quality information unavailable'
 })
 
 const statusCardClass = computed(() => {
   const s = props.location.status?.toLowerCase()
-  if (s === 'excellent' || s === 'surveillance' || s === 'good') return 'status-safe'
-  if (s === 'moderate' || s === 'alert') return 'status-caution'
-  if (s === 'poor' || s === 'action' || s === 'very poor') return 'status-unsafe'
+  if (s === 'excellent' || s === 'surveillance' || s === 'good') return 'status-clean'
+  if (s === 'moderate' || s === 'alert') return 'status-moderate'
+  if (s === 'poor' || s === 'action' || s === 'very poor') return 'status-unclean'
   return 'status-unknown'
 })
 
@@ -507,17 +518,17 @@ function openPlanner() {
   border-left: 5px solid;
 }
 
-.status-safe {
+.status-clean {
   background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
   border-left-color: #28a745;
 }
 
-.status-caution {
+.status-moderate {
   background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
   border-left-color: #ffc107;
 }
 
-.status-unsafe {
+.status-unclean {
   background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
   border-left-color: #dc3545;
 }
@@ -628,11 +639,60 @@ function openPlanner() {
 }
 
 .threshold-info {
-  text-align: center;
   margin-top: 10px;
-  padding: 8px;
-  background: #f1f3f5;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.threshold-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.threshold-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 8px;
+  background: white;
   border-radius: 6px;
+  font-size: 0.75rem;
+}
+
+.threshold-status {
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.threshold-status.excellent {
+  color: #28a745;
+}
+
+.threshold-status.good {
+  color: #20c997;
+}
+
+.threshold-status.moderate {
+  color: #ffc107;
+}
+
+.threshold-status.poor {
+  color: #fd7e14;
+}
+
+.threshold-status.very-poor {
+  color: #dc3545;
+}
+
+.threshold-range {
+  color: #6c757d;
+  font-size: 0.7rem;
+  margin-left: 20px;
 }
 
 /* Alert Box */
@@ -731,11 +791,6 @@ function openPlanner() {
   font-size: 0.7rem;
   font-weight: 500;
   white-space: nowrap;
-}
-
-/* ========== SECTION 4: Description ========== */
-.description-section {
-  padding: 0 20px 20px 20px;
 }
 
 .description-text {

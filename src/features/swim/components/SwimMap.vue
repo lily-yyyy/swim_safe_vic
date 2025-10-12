@@ -24,7 +24,7 @@ const emit = defineEmits(['marker-clicked'])
 
 // Google Maps config
 const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
-const mapId = import.meta.env.VITE_GOOGLE_MAP_ID || ''
+// const mapId = import.meta.env.VITE_GOOGLE_MAP_ID || ''
 
 // Refs
 const center = ref({ lat: -37.8679, lng: 144.9740 })
@@ -38,61 +38,226 @@ const directionsService = ref(null)
 let directionsRenderer = null
 
 const customMapStyle = [
-  {
-    "featureType": "administrative",
-    "elementType": "labels.text.fill",
-    "stylers": [{"color": "#444444"}]
-  },
-  {
-    "featureType": "landscape",
-    "elementType": "all",
-    "stylers": [{"color": "#f2f2f2"}]
-  },
-  {
-    "featureType": "poi",
-    "elementType": "all",
-    "stylers": [{"visibility": "off"}]
-  },
-  {
-    "featureType": "road",
-    "elementType": "all",
-    "stylers": [{"saturation": -100}, {"lightness": 45}]
-  },
-  {
-    "featureType": "road.highway",
-    "elementType": "all",
-    "stylers": [{"visibility": "simplified"}]
-  },
-  {
-    "featureType": "road.arterial",
-    "elementType": "labels.icon",
-    "stylers": [{"visibility": "off"}]
-  },
-  {
-    "featureType": "transit",
-    "elementType": "all",
-    "stylers": [{"visibility": "off"}]
-  },
-  {
-    "featureType": "water",
-    "elementType": "all",
-    "stylers": [{"color": "#46bcec"}, {"visibility": "on"}]
-  }
+    {
+        "featureType": "administrative",
+        "elementType": "labels.text.fill",
+        "stylers": [
+            {
+                "color": "#686868"
+            }
+        ]
+    },
+    {
+        "featureType": "landscape",
+        "elementType": "all",
+        "stylers": [
+            {
+                "color": "#f2f2f2"
+            }
+        ]
+    },
+    {
+        "featureType": "poi",
+        "elementType": "all",
+        "stylers": [
+            {
+                "visibility": "off"
+            }
+        ]
+    },
+    {
+        "featureType": "road",
+        "elementType": "all",
+        "stylers": [
+            {
+                "saturation": -100
+            },
+            {
+                "lightness": 45
+            }
+        ]
+    },
+    {
+        "featureType": "road.highway",
+        "elementType": "all",
+        "stylers": [
+            {
+                "visibility": "simplified"
+            }
+        ]
+    },
+    {
+        "featureType": "road.highway",
+        "elementType": "geometry.fill",
+        "stylers": [
+            {
+                "lightness": "-22"
+            }
+        ]
+    },
+    {
+        "featureType": "road.highway",
+        "elementType": "geometry.stroke",
+        "stylers": [
+            {
+                "saturation": "11"
+            },
+            {
+                "lightness": "-51"
+            }
+        ]
+    },
+    {
+        "featureType": "road.highway",
+        "elementType": "labels.text",
+        "stylers": [
+            {
+                "saturation": "3"
+            },
+            {
+                "lightness": "-56"
+            },
+            {
+                "weight": "2.20"
+            }
+        ]
+    },
+    {
+        "featureType": "road.highway",
+        "elementType": "labels.text.fill",
+        "stylers": [
+            {
+                "lightness": "-52"
+            }
+        ]
+    },
+    {
+        "featureType": "road.highway",
+        "elementType": "labels.text.stroke",
+        "stylers": [
+            {
+                "weight": "6.13"
+            }
+        ]
+    },
+    {
+        "featureType": "road.highway",
+        "elementType": "labels.icon",
+        "stylers": [
+            {
+                "lightness": "-10"
+            },
+            {
+                "gamma": "0.94"
+            },
+            {
+                "weight": "1.24"
+            },
+            {
+                "saturation": "-100"
+            },
+            {
+                "visibility": "off"
+            }
+        ]
+    },
+    {
+        "featureType": "road.arterial",
+        "elementType": "geometry",
+        "stylers": [
+            {
+                "lightness": "-16"
+            }
+        ]
+    },
+    {
+        "featureType": "road.arterial",
+        "elementType": "labels.text.fill",
+        "stylers": [
+            {
+                "saturation": "-41"
+            },
+            {
+                "lightness": "-41"
+            }
+        ]
+    },
+    {
+        "featureType": "road.arterial",
+        "elementType": "labels.text.stroke",
+        "stylers": [
+            {
+                "weight": "5.46"
+            }
+        ]
+    },
+    {
+        "featureType": "road.arterial",
+        "elementType": "labels.icon",
+        "stylers": [
+            {
+                "visibility": "off"
+            }
+        ]
+    },
+    {
+        "featureType": "road.local",
+        "elementType": "geometry.fill",
+        "stylers": [
+            {
+                "weight": "0.72"
+            },
+            {
+                "lightness": "-16"
+            }
+        ]
+    },
+    {
+        "featureType": "road.local",
+        "elementType": "labels.text.fill",
+        "stylers": [
+            {
+                "lightness": "-37"
+            }
+        ]
+    },
+    {
+        "featureType": "transit",
+        "elementType": "all",
+        "stylers": [
+            {
+                "visibility": "off"
+            }
+        ]
+    },
+    {
+        "featureType": "water",
+        "elementType": "all",
+        "stylers": [
+            {
+                "color": "#b7e4f4"
+            },
+            {
+                "visibility": "on"
+            }
+        ]
+    }
 ];
-
-const mapOptions = ref({
-  styles: customMapStyle,
-  zoomControl: true,
-  streetViewControl: false,
-  mapTypeControl: false,
-  fullscreenControl: false
-})
 
 // Setup directions on map
 watch(
   () => mapRef.value?.map,
   (map) => {
     if (map && window.google) {
+      // ✅ Apply custom styles directly to the map instance
+      map.setOptions({
+        styles: customMapStyle,
+        zoomControl: true,
+        streetViewControl: false,
+        mapTypeControl: false,
+        fullscreenControl: false
+      })
+      
       directionsService.value = new window.google.maps.DirectionsService()
       directionsRenderer = new window.google.maps.DirectionsRenderer({
         map,
@@ -104,6 +269,8 @@ watch(
           strokeWeight: 6
         }
       })
+      
+      console.log('Custom styles applied to map!')
     }
   },
   { immediate: true }
@@ -370,16 +537,14 @@ async function handleMarkerClick(location) {
   }
 }
 </script>
-
+<!-- :map-id="mapId" -->
 <template>
   <div class="swim-map">
     <GoogleMap
       ref="mapRef"
       :api-key="apiKey"
-      :map-id="mapId"
       :center="center"
       :zoom="12"
-      :options="mapOptions"
       class="google-map"
     >
       <!-- Beach & River Markers -->

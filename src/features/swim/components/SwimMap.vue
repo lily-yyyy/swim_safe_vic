@@ -411,6 +411,7 @@ onMounted(async () => {
         type: 'river',
         status, // "Excellent" | "Good" | "Moderate" | "Poor" | "Very Poor"
         wqi,
+        prediction_timestamp: predicted.timestamp,
         icon: getStatusColorIcon(status),
         description: river.description || 'No description available.'
       }

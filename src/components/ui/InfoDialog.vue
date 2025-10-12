@@ -46,12 +46,12 @@
       <h6 class="section-title">Current Conditions</h6>
       
       <div class="metrics-grid">
-        <!-- Rainfall -->
-        <div class="metric-card" v-if="location.rainfall_mm !== undefined">
+        <!-- Rainfall (Both Beach & River) -->
+        <div class="metric-card" v-if="showRainfall">
           <div class="metric-icon">🌧️</div>
           <div class="metric-content">
             <div class="metric-label">Rainfall</div>
-            <div class="metric-value">{{ location.rainfall_mm }}mm</div>
+            <div class="metric-value">{{ rainfallValue }}mm</div>
             <div class="metric-sublabel">Last 24 hours</div>
           </div>
         </div>
@@ -101,6 +101,32 @@
             <div class="metric-sublabel">Water Quality Index</div>
           </div>
         </div>
+
+        <!-- River: pH Level -->
+        <div 
+          class="metric-card" 
+          v-if="location.type === 'river' && location.predicted?.ph"
+        >
+          <div class="metric-icon">⚗️</div>
+          <div class="metric-content">
+            <div class="metric-label">pH Level</div>
+            <div class="metric-value">{{ location.predicted.ph.toFixed(1) }}</div>
+            <div class="metric-sublabel">Acidity/Alkalinity</div>
+          </div>
+        </div>
+
+        <!-- River: Turbidity -->
+        <div 
+          class="metric-card" 
+          v-if="location.type === 'river' && location.predicted?.turbidity_ntu"
+        >
+          <div class="metric-icon">🌫️</div>
+          <div class="metric-content">
+            <div class="metric-label">Turbidity</div>
+            <div class="metric-value">{{ Math.round(location.predicted.turbidity_ntu) }}</div>
+            <div class="metric-sublabel">NTU</div>
+          </div>
+        </div>
       </div>
 
       <!-- Safety Threshold Info -->
@@ -113,7 +139,7 @@
 
     <!-- Weather Context (if heavy rain) -->
     <div 
-      v-if="location.rainfall_mm > 5" 
+      v-if="rainfallValue > 5" 
       class="alert-box"
       :class="rainfallAlertClass"
     >
@@ -133,8 +159,8 @@
             ⚠️ Data may be outdated
           </div>
         </div>
-        <div v-if="location.extraInfo?.dataSource" class="data-source-badge">
-          {{ location.extraInfo.dataSource }}
+        <div v-if="dataSourceBadge" class="data-source-badge">
+          {{ dataSourceBadge }}
         </div>
       </div>
     </div>
@@ -176,8 +202,8 @@ const emit = defineEmits(['close', 'open-planner'])
 // ========== Timestamp Formatting ==========
 const formattedTimestamp = computed(() => {
   // Try multiple locations for timestamp:
-  // 1. Top level (beaches use this)
-  // 2. predicted.timestamp (rivers use this)
+  // 1. Top level prediction_timestamp (beaches & rivers use this now)
+  // 2. predicted.timestamp (fallback for rivers)
   // 3. extraInfo.timestamp (fallback)
   const timestamp = 
     props.location.prediction_timestamp || 
@@ -209,7 +235,6 @@ const formattedTimestamp = computed(() => {
 })
 
 const relativeTime = computed(() => {
-  // Try multiple locations for timestamp
   const timestamp = 
     props.location.prediction_timestamp || 
     props.location.predicted?.timestamp ||
@@ -236,7 +261,6 @@ const relativeTime = computed(() => {
 })
 
 const isDataStale = computed(() => {
-  // Try multiple locations for timestamp
   const timestamp = 
     props.location.prediction_timestamp || 
     props.location.predicted?.timestamp ||
@@ -311,26 +335,49 @@ const waterQualityUnit = computed(() => {
   return props.location.type === 'beach' ? 'Beach quality' : 'River quality'
 })
 
+// ========== NEW: Rainfall handling for both beaches and rivers ==========
+const showRainfall = computed(() => {
+  return props.location.rainfall_mm !== undefined || 
+         props.location.predicted?.rainfall_mm !== undefined
+})
+
+const rainfallValue = computed(() => {
+  return props.location.rainfall_mm || 
+         props.location.predicted?.rainfall_mm || 
+         0
+})
+
 // Rainfall Alert
 const rainfallAlertIcon = computed(() => {
-  const r = props.location.rainfall_mm || 0
+  const r = rainfallValue.value
   if (r > 20) return '🌧️'
   if (r > 5) return '🌦️'
   return '💧'
 })
 
 const rainfallAlertText = computed(() => {
-  const r = props.location.rainfall_mm || 0
+  const r = rainfallValue.value
   if (r > 20) return 'Heavy rainfall detected. Water quality may be poor for 24-48 hours.'
   if (r > 5) return 'Light rain recently. Water quality may be temporarily affected.'
   return ''
 })
 
 const rainfallAlertClass = computed(() => {
-  const r = props.location.rainfall_mm || 0
+  const r = rainfallValue.value
   if (r > 20) return 'alert-danger'
   if (r > 5) return 'alert-warning'
   return ''
+})
+
+// ========== NEW: Data Source Badge ==========
+const dataSourceBadge = computed(() => {
+  if (props.location.type === 'beach') {
+    return props.location.extraInfo?.dataSource
+  }
+  if (props.location.type === 'river' && props.location.wqi) {
+    return 'ML Prediction'
+  }
+  return null
 })
 
 // ========== Actions ==========

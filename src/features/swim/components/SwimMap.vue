@@ -187,7 +187,7 @@ onMounted(async () => {
         ...beach,
         type: 'beach',
         status,
-        icon: getStatusColorIcon(status),
+        //icon: getStatusColorIcon(status),
         description: beach.description_tips || 'No description available.'
       }
     })
@@ -197,25 +197,57 @@ onMounted(async () => {
       const status = river?.predicted?.category ?? 'Poor'
       const wqi = river.predicted?.wqi ?? null
 
-       console.log('River:', river.name, {
-        predictedCategory: river?.predicted?.category,
-        wqi: river?.predicted?.wqi,
-        rawPredicted: river?.predicted
-      })
+      //  console.log('River:', river.name, {
+      //   predictedCategory: river?.predicted?.category,
+      //   wqi: river?.predicted?.wqi,
+      //   rawPredicted: river?.predicted
+      // })
       
       return {
         ...river,
         type: 'river',
         status, // "Excellent" | "Good" | "Moderate" | "Poor" | "Very Poor",
         wqi,
-        icon: getStatusColorIcon(status),
+        //icon: getStatusColorIcon(status),
         description: river.description || 'No description available.'
       }
     })
   } catch (err) {
-    console.error('Error loading data:', err)
+   // console.error('Error loading data:', err)
   }
 })
+
+// function getIconForCurrentFilter(loc) {
+//   const quality = props.filters?.waterQuality
+
+//   if (quality === 'caution') {
+//     return 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png'
+//   }
+//   if (quality === 'unsafe') {
+//     return 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
+//   }
+
+//   // Default icon from status
+//   return getStatusColorIcon(loc.status)
+// }
+
+function getIconForCurrentFilter(loc) {
+  const quality = props.filters?.waterQuality
+
+  if (quality === 'caution') {
+    return 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png'
+  }
+
+  if (quality === 'unsafe') {
+    return 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
+  }
+
+  // Default: derive from actual status
+  return getStatusColorIcon(loc.status)
+}
+
+
+
 
 // Status logic
 function getBeachStatus(enterococci) {
@@ -285,6 +317,39 @@ function getDistanceKm(lat1, lon1, lat2, lon2) {
 //   return data
 // })
 
+// const filteredLocations = computed(() => {
+//   const show = props.filters?.showOnMap || 'all'
+//   const quality = props.filters?.waterQuality
+//   const query = props.searchQuery?.toLowerCase().trim() || ''
+//   const distance = props.filters?.distance ? parseFloat(props.filters.distance) : null
+
+//   let data = []
+
+//   if (show === 'all' || show === 'beach') data.push(...allBeaches.value)
+//   if (show === 'all' || show === 'river') data.push(...allRivers.value)
+
+//   //  Quality filter
+//   if (quality) {
+//     const statusMap = { safe: 'Surveillance', caution: 'Alert', unsafe: 'Action' }
+//     data = data.filter(loc => loc.status === statusMap[quality])
+//   }
+
+//   //  Search filter
+//   if (query) {
+//     data = data.filter(loc => loc.name?.toLowerCase().includes(query))
+//   }
+
+//   //  Distance filter (only if user location available)
+//   if (distance && userLocation.value) {
+//     data = data.filter(loc => {
+//       const d = getDistanceKm(userLocation.value.lat, userLocation.value.lng, loc.lat, loc.lon)
+//       return d <= distance
+//     })
+//   }
+
+//   return data
+// })
+
 const filteredLocations = computed(() => {
   const show = props.filters?.showOnMap || 'all'
   const quality = props.filters?.waterQuality
@@ -296,27 +361,49 @@ const filteredLocations = computed(() => {
   if (show === 'all' || show === 'beach') data.push(...allBeaches.value)
   if (show === 'all' || show === 'river') data.push(...allRivers.value)
 
-  //  Quality filter
+  // Fixed Quality Filter
   if (quality) {
-    const statusMap = { safe: 'Surveillance', caution: 'Alert', unsafe: 'Action' }
-    data = data.filter(loc => loc.status === statusMap[quality])
+    data = data.filter(loc => {
+      if (loc.type === 'beach') {
+        const map = { safe: 'Good', caution: 'Very Poor', unsafe: 'Action' }
+        return loc.status === map[quality]
+      }
+      if (loc.type === 'river') {
+        const map = {
+          safe: ['Excellent', 'Good'],
+          caution: ['Moderate', 'Poor'],
+          unsafe: ['Very Poor']
+        }
+        return map[quality]?.includes(loc.status)
+      }
+      return true
+    })
   }
 
-  //  Search filter
+  // Search
   if (query) {
     data = data.filter(loc => loc.name?.toLowerCase().includes(query))
   }
 
-  //  Distance filter (only if user location available)
-  if (distance && userLocation.value) {
+  // Distance (only if user location exists)
+  
+  if (distance) {
+    if (!userLocation.value) return []
+
     data = data.filter(loc => {
-      const d = getDistanceKm(userLocation.value.lat, userLocation.value.lng, loc.lat, loc.lon)
+      const d = getDistanceKm(
+        userLocation.value.lat,
+        userLocation.value.lng,
+        loc.lat,
+        loc.lon
+      )
       return d <= distance
     })
   }
 
   return data
 })
+
 
 
 // Handle marker click
@@ -368,7 +455,9 @@ async function handleMarkerClick(location) {
         :options="{
           position: { lat: loc.lat, lng: loc.lon },
           title: `${loc.name} (${loc.status})`,
-          icon: { url: loc.icon }
+          //icon: { url: loc.icon }
+          icon: { url: getIconForCurrentFilter(loc) }
+
         }"
         @click="handleMarkerClick(loc)"
       />

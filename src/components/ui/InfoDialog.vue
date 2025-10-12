@@ -8,8 +8,14 @@
         
         <!-- Badges Row -->
         <div class="badges-row">
-          <!-- Type Badge -->
-          <span class="badge badge-type" :class="typeBadgeClass">
+          <!-- Fountain Badge -->
+          <span v-if="location.type === 'fountain'" class="badge badge-fountain">
+            <span class="badge-icon">⛲</span>
+            <span class="badge-text">Water Fountain</span>
+          </span>
+
+          <!-- Beach/River Badges (existing code) -->
+          <span v-else-if="location.type !== 'fountain'" class="badge badge-type" :class="typeBadgeClass">
             <span class="badge-icon">{{ typeIcon }}</span>
             <span class="badge-text">{{ typeText }}</span>
           </span>
@@ -29,7 +35,7 @@
     <hr class="divider" />
 
     <!-- ========== SECTION 2: Swimming Status ========== -->
-    <div class="status-section">
+    <div v-if="location.type !== 'fountain'" class="status-section">
       <div class="status-card" :class="statusCardClass">
         <div class="status-icon-large">{{ statusIcon }}</div>
         <div class="status-content">
@@ -42,13 +48,13 @@
     <hr class="divider" />
 
     <!-- ========== SECTION 3: ML Data Metrics ========== -->
-    <div class="metrics-section">
+    <div v-if="location.type !== 'fountain'" class="metrics-section">
       <h6 class="section-title">Current Conditions</h6>
       
       <div class="metrics-grid">
         <!-- Rainfall (Both Beach & River) -->
         <div class="metric-card" v-if="showRainfall">
-          <div class="metric-icon">🌧️</div>
+          <div class="metric-icon"><img src="@/assets/icons/rainfall2.png" /></div>
           <div class="metric-content">
             <div class="metric-label">Rainfall</div>
             <div class="metric-value">{{ rainfallValue }}mm</div>
@@ -58,7 +64,7 @@
 
         <!-- Temperature -->
         <div class="metric-card" v-if="location.temperature && location.temperature !== 'N/A'">
-          <div class="metric-icon">🌡️</div>
+          <div class="metric-icon"><img src="@/assets/icons/temp2.png" /></div>
           <div class="metric-content">
             <div class="metric-label">Temperature</div>
             <div class="metric-value">{{ location.temperature }}°C</div>
@@ -71,7 +77,7 @@
           class="metric-card metric-primary" 
           v-if="location.type === 'beach' && location.enterococci"
         >
-          <div class="metric-icon">🦠</div>
+          <div class="metric-icon"><img src="@/assets/icons/enterococci.png" /></div>
           <div class="metric-content">
             <div class="metric-label">Enterococci</div>
             <div class="metric-value">{{ Math.round(location.enterococci) }}</div>
@@ -84,7 +90,7 @@
           class="metric-card metric-primary" 
           v-if="location.type === 'river' && location.wqi"
         >
-          <div class="metric-icon">📊</div>
+          <div class="metric-icon"><img src="@/assets/icons/wqi.png" /></div>
           <div class="metric-content">
             <div class="metric-label">WQI Index</div>
             <div class="metric-value">{{ location.wqi }}</div>
@@ -97,7 +103,7 @@
           class="metric-card" 
           v-if="location.type === 'river' && location.predicted?.ph"
         >
-          <div class="metric-icon">⚗️</div>
+          <div class="metric-icon"><img src="@/assets/icons/ph.png" /></div>
           <div class="metric-content">
             <div class="metric-label">pH Level</div>
             <div class="metric-value">{{ location.predicted.ph.toFixed(1) }}</div>
@@ -110,7 +116,7 @@
           class="metric-card" 
           v-if="location.type === 'river' && location.predicted?.turbidity_ntu"
         >
-          <div class="metric-icon">🌫️</div>
+          <div class="metric-icon"><img src="@/assets/icons/turbidity.png" /></div>
           <div class="metric-content">
             <div class="metric-label">Turbidity</div>
             <div class="metric-value">{{ Math.round(location.predicted.turbidity_ntu) }}</div>
@@ -122,7 +128,7 @@
       <!-- Safety Threshold Info for Beach -->
       <div v-if="location.type === 'beach' && location.enterococci" class="threshold-info">
         <small class="text-muted">
-          ℹ️ Safe threshold: ≤ 40 orgs/100mL
+        Safe threshold: ≤ 40 orgs/100mL
         </small>
       </div>
 
@@ -130,23 +136,23 @@
       <div v-if="location.type === 'river' && location.wqi" class="threshold-info">
         <div class="threshold-grid">
           <div class="threshold-item">
-            <span class="threshold-status excellent">✅ Excellent</span>
+            <span class="threshold-status excellent">Excellent</span>
             <span class="threshold-range">WQI ≥ 80</span>
           </div>
           <div class="threshold-item">
-            <span class="threshold-status good">🟢 Good</span>
+            <span class="threshold-status good">Good</span>
             <span class="threshold-range">60-79</span>
           </div>
           <div class="threshold-item">
-            <span class="threshold-status moderate">⚠️ Moderate</span>
+            <span class="threshold-status moderate">Moderate</span>
             <span class="threshold-range">40-59</span>
           </div>
           <div class="threshold-item">
-            <span class="threshold-status poor">🔴 Poor</span>
+            <span class="threshold-status poor">Poor</span>
             <span class="threshold-range">20-39</span>
           </div>
           <div class="threshold-item">
-            <span class="threshold-status very-poor">❌ Very Poor</span>
+            <span class="threshold-status very-poor">Very Poor</span>
             <span class="threshold-range">< 20</span>
           </div>
         </div>
@@ -164,9 +170,8 @@
     </div>
 
     <!-- Data Freshness -->
-    <div class="data-info">
+    <div v-if="location.type !== 'fountain'" class="data-info">
       <div class="timestamp-card" :class="{ 'timestamp-stale': isDataStale }">
-        <div class="timestamp-icon">{{ isDataStale ? '⚠️' : '🕐' }}</div>
         <div class="timestamp-content">
           <div class="timestamp-label">Last Updated</div>
           <div class="timestamp-value">{{ formattedTimestamp }}</div>
@@ -190,7 +195,7 @@
         <span>Get Directions</span>
       </button>
       
-      <button class="btn btn-secondary w-100" @click="openPlanner">
+      <button v-if="location.type !== 'fountain'" class="btn btn-secondary w-100" @click="openPlanner">
         <span class="btn-icon">🗓️</span>
         <span>Add to Planner</span>
       </button>
@@ -466,6 +471,12 @@ function openPlanner() {
   font-size: 0.85em;
 }
 
+.badge-fountain {
+  background: #e1f5fe;
+  color: #0277bd;
+  border: 1px solid #4fc3f7;
+}
+
 .badge-beach {
   background: #e3f2fd;
   color: #1565c0;
@@ -519,23 +530,23 @@ function openPlanner() {
 }
 
 .status-clean {
-  background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
-  border-left-color: #28a745;
+  background-color: #38de40;
+  border-left-color: white;
 }
 
 .status-moderate {
-  background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
-  border-left-color: #ffc107;
+  background-color: #ede20e;
+  border-left-color: white;
 }
 
 .status-unclean {
-  background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
-  border-left-color: #dc3545;
+  background-color: #da0606;
+  border-left-color: white;
 }
 
 .status-unknown {
   background: linear-gradient(135deg, #e2e3e5 0%, #d6d8db 100%);
-  border-left-color: #6c757d;
+  border-left-color: white;
 }
 
 .status-icon-large {
@@ -592,11 +603,6 @@ function openPlanner() {
   transition: all 0.2s;
 }
 
-.metric-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
 .metric-highlight {
   background: #e8f4f8;
   border-color: #90caf9;
@@ -611,6 +617,11 @@ function openPlanner() {
 .metric-icon {
   font-size: 1.8em;
   line-height: 1;
+}
+
+.metric-icon img {
+  width: 30px;
+  height: 30px;
 }
 
 .metric-content {

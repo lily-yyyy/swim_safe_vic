@@ -285,15 +285,33 @@ function handleSearchSelected(location) {
   position: absolute;
   top: 0; 
   left: 0;
-  width: 320px;
+  width: 400px;
   height: 100vh; 
-  background: white;
+  background: rgb(255, 255, 255);
   padding: 16px;
   padding-top: 96px; 
   border-radius: 0 8px 8px 0;
   box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.1);
   z-index: 1000;
   overflow-y: auto;
+}
+
+/* Scrollbar */
+.floating-sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.floating-sidebar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.floating-sidebar::-webkit-scrollbar-thumb {
+  background: #bbb;
+  border-radius: 3px;
+}
+
+.floating-sidebar::-webkit-scrollbar-thumb:hover {
+  background: #888;
 }
 
 @media (max-width: 768px) {

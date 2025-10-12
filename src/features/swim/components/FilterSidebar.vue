@@ -62,6 +62,15 @@ function resetFilters() {
 
 <template>
   <div class="filter-sidebar">
+    <div class="instruction-banner">
+      <h6 class="instruction-title">How to Use</h6>
+      <ol class="instruction-steps">
+        <li>Type and search for a beach or river</li>
+        <li>Apply filters to narrow results</li>
+        <li>Filter amenities</li>
+        <li>Click on map markers for details</li>
+      </ol>
+    </div>
     <!--  Search -->
     <div class="search-container">
       <img src="@/assets/icons/search.svg" class="search-icon" />
@@ -92,15 +101,15 @@ function resetFilters() {
       <label>Show on Map</label>
       <div class="btn-group">
         <button class="btn" :class="{ active: filters.showOnMap === 'all' }" @click="setFilter('showOnMap', 'all')">
-          <img src="@/assets/icons/swim.svg" />
+          <img src="@/assets/icons/all.png" />
           All Swim
         </button>
         <button class="btn" :class="{ active: filters.showOnMap === 'river' }" @click="setFilter('showOnMap', 'river')">
-          <img src="@/assets/icons/river.svg" />
+          <img src="@/assets/icons/r.png" />
           River
         </button>
         <button class="btn" :class="{ active: filters.showOnMap === 'beach' }" @click="setFilter('showOnMap', 'beach')">
-          <img src="@/assets/icons/beach.svg" />
+          <img src="@/assets/icons/b.png" />
           Beach
         </button>
       </div>
@@ -110,9 +119,18 @@ function resetFilters() {
     <section>
       <label>Water Quality</label>
       <div class="btn-group">
-        <button class="btn" :class="{ active: filters.waterQuality === 'clean' }" @click="setFilter('waterQuality', 'clean')">Clean</button>
-        <button class="btn" :class="{ active: filters.waterQuality === 'moderate' }" @click="setFilter('waterQuality', 'moderate')">Moderate</button>
-        <button class="btn" :class="{ active: filters.waterQuality === 'unclean' }" @click="setFilter('waterQuality', 'unclean')">Unclean</button>
+        <button class="btn" :class="{ active: filters.waterQuality === 'clean' }" @click="setFilter('waterQuality', 'clean')">
+          <img src="@/assets/icons/excellent.png" />
+          Clean
+        </button>
+        <button class="btn" :class="{ active: filters.waterQuality === 'moderate' }" @click="setFilter('waterQuality', 'moderate')">
+          <img src="@/assets/icons/moderate.png" />
+          Moderate
+        </button>
+        <button class="btn" :class="{ active: filters.waterQuality === 'unclean' }" @click="setFilter('waterQuality', 'unclean')">
+          <img src="@/assets/icons/verypoor.png" />
+          Unclean
+        </button>
       </div>
     </section>
 
@@ -162,12 +180,14 @@ function resetFilters() {
 
       <!--  No results but search/filters applied -->
       <div v-else-if="searchQuery || filters.showOnMap !== 'all' || filters.waterQuality || filters.distance || filters.amenities.length > 0 || filters.toiletAccessibility">
-        🚫 <strong class="no-results">No results match your filters or search.</strong>
+        <img src="@/assets/icons/noresult.png" alt="No results" class="empty-icon-img" />
+        <strong class="no-results">No results match your filters or search.</strong>
       </div>
 
       <!--  Default state: nothing searched yet -->
       <div v-else>
-        🔍 <strong class="no-results">Please search to find results.</strong>
+        <img src="@/assets/icons/search.svg" alt="Search" class="empty-icon-img" />
+        <strong class="no-results">Please search to find results.</strong>
       </div>
     </section>
   </div>
@@ -182,9 +202,13 @@ function resetFilters() {
   height: 100vh;
   padding-bottom: 20px;
   padding-right: 6px;
-  margin-top: -20px; /* Add this - adjust the value to match your navbar height */
-  padding-top: 20px; /* Add this to compensate for content inside */
 }
+
+/* Scrollbar */
+.filter-sidebar::-webkit-scrollbar {
+  width: 0px;
+}
+
 
 /* Mobile scroll */
 @media (max-width: 768px) {
@@ -335,6 +359,18 @@ label {
 }
 
 /* Reset Button */
+/* .empty-state-custom {
+  text-align: center;
+  padding: 20px;
+} */
+
+.empty-icon-img {
+  width: 20px;
+  height: 20px;
+  margin: 12px;
+  opacity: 0.6;
+}
+
 .reset-btn {
   background: transparent;
   border: 1px solid #999;
@@ -352,7 +388,7 @@ label {
   margin-top: 12px;
   padding: 10px;
   border-radius: 6px;
-  color: #007b7f; 
+  /* color: #007b7f;  */
 }
 
 .reset-btn:hover {

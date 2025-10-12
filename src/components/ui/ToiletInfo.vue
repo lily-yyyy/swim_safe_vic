@@ -155,18 +155,16 @@ function submitForm() {
 
 <style scoped>
 .toilet-info-overlay {
-  position: fixed;
-  top: 64px; /* leave space below navbar */
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.4);
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 20px;
-  z-index: 9999;
+  position: absolute;
+  right: 20px;
+  top: 100px;
+  width: 380px;
+  max-width: 90%;
+  max-height: 85vh;
   overflow-y: auto;
+  z-index: 1000;
+  border: 1px solid #e0e0e0;
+  padding: 0;
 }
 
 .dialog {

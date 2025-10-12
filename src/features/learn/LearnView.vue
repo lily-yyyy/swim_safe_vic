@@ -132,11 +132,11 @@
     </section>
 
     <!-- Water quality index Section-->
-     <section class="py-5 text-center bg-white">
+     <!-- <section class="py-5 text-center bg-white">
       <div class="container">
         <h2 class="text-center fw-bold mb-4">Water Quality Index (WQI)</h2>
         
-        <!-- Labels -->
+ 
         <div class="d-flex justify-content-center flex-wrap gap-4 mb-4">
           <RainIcon icon="excellent.png" label="Excellent (80-100): Safe to swim" />
           <RainIcon icon="good.png" label="Good (70-79): Usually safe" />
@@ -145,12 +145,12 @@
           <RainIcon icon="verypoor.png" label="Very Poor (0-29): Stay out!" />
         </div>
 
-        <!-- Description -->
+
         <p class="text-gray-700 text-lg mb-4">
           Our beaches show real-time <span class="font-semibold text-blue-600">Water Quality Index</span> in the app!
         </p>
       </div>
-    </section>
+    </section> -->
 
     <!-- Rain Impact Section -->
     <section class="py-5 bg-white">

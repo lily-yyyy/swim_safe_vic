@@ -283,23 +283,25 @@ function handleSearchSelected(location) {
 
 .floating-sidebar {
   position: absolute;
-  top: 80px;
+  top: 0; 
   left: 0;
   width: 320px;
+  height: 100vh; 
   background: white;
   padding: 16px;
+  padding-top: 96px; 
   border-radius: 0 8px 8px 0;
   box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.1);
   z-index: 1000;
-  max-height: calc(100vh - 100px);
   overflow-y: auto;
 }
 
 @media (max-width: 768px) {
   .floating-sidebar {
     position: fixed;
-    top: 70px;
-    height: calc(100vh - 70px);
+    top: 0;
+    height: 100vh;
+    padding-top: 86px;
     transform: translateX(-100%);
     border-radius: 0;
     width: 80%;

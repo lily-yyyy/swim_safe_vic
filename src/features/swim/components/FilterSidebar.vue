@@ -179,9 +179,11 @@ function resetFilters() {
   flex-direction: column;
   gap: 16px;
   overflow-y: auto;
-  height: 100%;
+  height: 100vh;
   padding-bottom: 20px;
   padding-right: 6px;
+  margin-top: -20px; /* Add this - adjust the value to match your navbar height */
+  padding-top: 20px; /* Add this to compensate for content inside */
 }
 
 /* Mobile scroll */

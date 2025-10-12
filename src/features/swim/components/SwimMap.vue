@@ -246,13 +246,13 @@ onMounted(async () => {
         type: 'river',
         status, // "Excellent" | "Good" | "Moderate" | "Poor" | "Very Poor"
         wqi,
-        icon: getStatusColorIcon(status),
+        //icon: getStatusColorIcon(status),
         description: river.description || 'No description available.'
       }
     })
     
   } catch (err) {
-    console.error('Error loading data:', err)
+   // console.error('Error loading data:', err)
   }
 })
 
@@ -333,13 +333,19 @@ const filteredLocations = computed(() => {
   // Distance filter (only if user location available)
   if (distance && userLocation.value) {
     data = data.filter(loc => {
-      const d = getDistanceKm(userLocation.value.lat, userLocation.value.lng, loc.lat, loc.lon)
+      const d = getDistanceKm(
+        userLocation.value.lat,
+        userLocation.value.lng,
+        loc.lat,
+        loc.lon
+      )
       return d <= distance
     })
   }
 
   return data
 })
+
 
 
 // Handle marker click
@@ -391,7 +397,9 @@ async function handleMarkerClick(location) {
         :options="{
           position: { lat: loc.lat, lng: loc.lon },
           title: `${loc.name} (${loc.status})`,
-          icon: { url: loc.icon }
+          //icon: { url: loc.icon }
+          icon: { url: getIconForCurrentFilter(loc) }
+
         }"
         @click="handleMarkerClick(loc)"
       />

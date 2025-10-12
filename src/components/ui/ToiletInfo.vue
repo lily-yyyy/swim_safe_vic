@@ -37,7 +37,7 @@
 
         <p><strong>Baby Change:</strong> {{ toilet.babyChange ? 'Available' : 'Not available' }}</p>
 
-        <!--  Latest Comments -->
+        <!-- Latest Comments -->
         <div v-if="toilet.comments?.length" class="mb-3">
           <h6>Latest Comments:</h6>
           <ul class="list-group">
@@ -78,12 +78,18 @@
             >★</span>
           </div>
 
-          <p><strong>Write your comment:</strong></p>
+          <!-- Comment input with 100-word limit -->
+          <p><strong>Write your comment (max 100 words):</strong></p>
           <textarea
             v-model="comment"
             placeholder="Share your experience..."
             rows="3"
           ></textarea>
+
+          <!-- Live word counter -->
+          <p class="word-count">
+            {{ wordCount }} / 100 words
+          </p>
         </div>
       </div>
 
@@ -97,24 +103,44 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, watch } from 'vue'
 
+// Props: receives toilet object from parent
 const props = defineProps({
   toilet: { type: Object, required: true }
 })
 
+// Emits for closing and submitting
 const emit = defineEmits(['close', 'submit'])
 
+// Local states for feedback form
 const cleanStatus = ref('yes')
 const rating = ref(0)
 const comment = ref('')
 
+// Computed property for live word counting
+const wordCount = computed(() =>
+  comment.value.trim().split(/\s+/).filter(Boolean).length
+)
+
+// Watcher to enforce 100-word maximum limit
+watch(comment, (newVal) => {
+  const words = newVal.trim().split(/\s+/)
+  if (words.length > 100) {
+    // If over limit, truncate and show alert
+    comment.value = words.slice(0, 100).join(' ')
+    alert('You can only type up to 100 words.')
+  }
+})
+
+// Handle directions button click
 function handleDirections() {
   if (props.toilet.getDirections) props.toilet.getDirections()
   else alert('Directions not available.')
   emit('close')
 }
 
+// Submit form data to parent
 function submitForm() {
   const data = {
     toiletId: props.toilet.id,
@@ -123,9 +149,7 @@ function submitForm() {
     comment: comment.value
   }
 
-  
   emit('submit', data)
-  
 }
 </script>
 
@@ -157,11 +181,10 @@ function submitForm() {
   overflow: hidden;
 }
 
-/* Fixed Header */
+/* Header */
 .dialog-header {
   padding: 16px 20px;
   border-bottom: 1px solid #eee;
-  position: relative;
   background: white;
   z-index: 1;
 }
@@ -176,14 +199,14 @@ function submitForm() {
   color: #555;
 }
 
-/* Scrollable Content */
+/* Content */
 .dialog-content {
   padding: 16px 20px;
   overflow-y: auto;
   flex-grow: 1;
 }
 
-/* Fixed Footer */
+/* Footer */
 .dialog-footer {
   padding: 12px 20px;
   border-top: 1px solid #eee;
@@ -193,7 +216,7 @@ function submitForm() {
   gap: 12px;
 }
 
-/* Shared Styles */
+/* Rating */
 .rating-row {
   display: flex;
   align-items: center;
@@ -210,11 +233,13 @@ function submitForm() {
   font-weight: bold;
 }
 
+/* Accessibility icons */
 .access-icons span {
   font-size: 1.2rem;
   margin-right: 6px;
 }
 
+/* Directions button */
 .directions-btn {
   background: #007b7f;
   color: #fff;
@@ -227,6 +252,7 @@ function submitForm() {
   width: 100%;
 }
 
+/* Radio & Stars */
 .radio-group {
   display: flex;
   gap: 16px;
@@ -249,6 +275,7 @@ function submitForm() {
   color: #f5a623;
 }
 
+/* Textarea */
 textarea {
   width: 100%;
   padding: 8px;
@@ -256,6 +283,14 @@ textarea {
   border-radius: 6px;
   border: 1px solid #ccc;
   font-family: inherit;
+}
+
+/* Word counter */
+.word-count {
+  text-align: right;
+  font-size: 0.8rem;
+  color: #555;
+  margin-top: 4px;
 }
 
 /* Buttons */
@@ -279,7 +314,7 @@ textarea {
   flex: 1;
 }
 
-/* Responsive (Optional) */
+/* Responsive */
 @media (max-height: 500px) {
   .dialog {
     max-height: 100vh;

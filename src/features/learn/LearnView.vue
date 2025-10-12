@@ -53,6 +53,7 @@
         </div>
 
         <Swiper
+          data-testid="swiper"
           :modules="modules"
           :effect="'coverflow'"
           :grab-cursor="true"
@@ -69,7 +70,7 @@
           :navigation="true"
           class="parameter-swiper"
         >
-          <SwiperSlide v-for="(param, index) in allParameters" :key="index">
+          <SwiperSlide  v-for="(param, index) in allParameters" :key="index" data-testid="swiper-slide">
             <div
               class="parameter-flip-card"
               @mouseenter="handleMouseEnter(param.title)"

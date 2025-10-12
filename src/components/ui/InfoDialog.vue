@@ -485,7 +485,7 @@ function openPlanner() {
 }
 
 .btn-close {
-  background: transparent;
+  color: black;
   border: none;
   cursor: pointer;
   padding: 4px;

@@ -39,44 +39,46 @@ let directionsRenderer = null
 
 const customMapStyle = [
   {
-    "featureType": "administrative",
-    "elementType": "labels.text.fill",
-    "stylers": [{"color": "#444444"}]
+    "featureType": "all",
+    "elementType": "labels.text",
+    "stylers": [
+      { "color": "#878787" }
+    ]
+  },
+  {
+    "featureType": "all",
+    "elementType": "labels.text.stroke",
+    "stylers": [
+      { "visibility": "off" }
+    ]
   },
   {
     "featureType": "landscape",
     "elementType": "all",
-    "stylers": [{"color": "#f2f2f2"}]
-  },
-  {
-    "featureType": "poi",
-    "elementType": "all",
-    "stylers": [{"visibility": "off"}]
-  },
-  {
-    "featureType": "road",
-    "elementType": "all",
-    "stylers": [{"saturation": -100}, {"lightness": 45}]
+    "stylers": [
+      { "color": "#f9f5ed" }  // Warm beige landscape
+    ]
   },
   {
     "featureType": "road.highway",
     "elementType": "all",
-    "stylers": [{"visibility": "simplified"}]
+    "stylers": [
+      { "color": "#f5f5f5" }  // Light gray highways
+    ]
   },
   {
-    "featureType": "road.arterial",
-    "elementType": "labels.icon",
-    "stylers": [{"visibility": "off"}]
-  },
-  {
-    "featureType": "transit",
-    "elementType": "all",
-    "stylers": [{"visibility": "off"}]
+    "featureType": "road.highway",
+    "elementType": "geometry.stroke",
+    "stylers": [
+      { "color": "#c9c9c9" }  // Highway borders
+    ]
   },
   {
     "featureType": "water",
     "elementType": "all",
-    "stylers": [{"color": "#46bcec"}, {"visibility": "on"}]
+    "stylers": [
+      { "color": "#aee0f4" }  // Beautiful light blue water! 🌊
+    ]
   }
 ];
 

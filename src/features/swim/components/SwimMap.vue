@@ -39,46 +39,44 @@ let directionsRenderer = null
 
 const customMapStyle = [
   {
-    "featureType": "all",
-    "elementType": "labels.text",
-    "stylers": [
-      { "color": "#878787" }
-    ]
-  },
-  {
-    "featureType": "all",
-    "elementType": "labels.text.stroke",
-    "stylers": [
-      { "visibility": "off" }
-    ]
+    "featureType": "administrative",
+    "elementType": "labels.text.fill",
+    "stylers": [{"color": "#444444"}]
   },
   {
     "featureType": "landscape",
     "elementType": "all",
-    "stylers": [
-      { "color": "#f9f5ed" }  // Warm beige landscape
-    ]
+    "stylers": [{"color": "#f2f2f2"}]
+  },
+  {
+    "featureType": "poi",
+    "elementType": "all",
+    "stylers": [{"visibility": "off"}]
+  },
+  {
+    "featureType": "road",
+    "elementType": "all",
+    "stylers": [{"saturation": -100}, {"lightness": 45}]
   },
   {
     "featureType": "road.highway",
     "elementType": "all",
-    "stylers": [
-      { "color": "#f5f5f5" }  // Light gray highways
-    ]
+    "stylers": [{"visibility": "simplified"}]
   },
   {
-    "featureType": "road.highway",
-    "elementType": "geometry.stroke",
-    "stylers": [
-      { "color": "#c9c9c9" }  // Highway borders
-    ]
+    "featureType": "road.arterial",
+    "elementType": "labels.icon",
+    "stylers": [{"visibility": "off"}]
+  },
+  {
+    "featureType": "transit",
+    "elementType": "all",
+    "stylers": [{"visibility": "off"}]
   },
   {
     "featureType": "water",
     "elementType": "all",
-    "stylers": [
-      { "color": "#aee0f4" }  // Beautiful light blue water! 🌊
-    ]
+    "stylers": [{"color": "#46bcec"}, {"visibility": "on"}]
   }
 ];
 
@@ -246,13 +244,13 @@ onMounted(async () => {
         type: 'river',
         status, // "Excellent" | "Good" | "Moderate" | "Poor" | "Very Poor"
         wqi,
-        //icon: getStatusColorIcon(status),
+        icon: getStatusColorIcon(status),
         description: river.description || 'No description available.'
       }
     })
     
   } catch (err) {
-   // console.error('Error loading data:', err)
+    console.error('Error loading data:', err)
   }
 })
 
@@ -333,19 +331,13 @@ const filteredLocations = computed(() => {
   // Distance filter (only if user location available)
   if (distance && userLocation.value) {
     data = data.filter(loc => {
-      const d = getDistanceKm(
-        userLocation.value.lat,
-        userLocation.value.lng,
-        loc.lat,
-        loc.lon
-      )
+      const d = getDistanceKm(userLocation.value.lat, userLocation.value.lng, loc.lat, loc.lon)
       return d <= distance
     })
   }
 
   return data
 })
-
 
 
 // Handle marker click
@@ -397,9 +389,7 @@ async function handleMarkerClick(location) {
         :options="{
           position: { lat: loc.lat, lng: loc.lon },
           title: `${loc.name} (${loc.status})`,
-          //icon: { url: loc.icon }
-          icon: { url: getIconForCurrentFilter(loc) }
-
+          icon: { url: loc.icon }
         }"
         @click="handleMarkerClick(loc)"
       />

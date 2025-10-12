@@ -10,7 +10,7 @@
       
       <!-- Left: Logo -->
       <router-link class="navbar-brand d-flex align-items-center" to="/">
-        <img src="@/assets/vue.svg" alt="Logo" width="30" height="30" class="me-2" />
+        <img src="@/assets/vue.svg" alt="Logo" width="45" height="45"/>
         <span class="text-white fw-semibold">The Mermaid</span>
       </router-link>
 
@@ -34,7 +34,7 @@
             <router-link class="nav-link text-white" to="/">Home</router-link>
           </li>
           <li class="nav-item">
-            <router-link class="nav-link text-white" to="/swim">Water Quality Checker</router-link>
+            <router-link class="nav-link text-white" to="/swim">Water Quality Map</router-link>
           </li>
           <!-- <li class="nav-item">
             <router-link class="nav-link text-white" to="/about">About</router-link>
@@ -78,8 +78,8 @@ const route = useRoute()
 .custom-navbar {
   z-index: 10000;
   transition: background-color 0.3s ease;
-  padding-top: 0.75rem;
-  padding-bottom: 0.75rem;
+  padding-top: 0.1rem;
+  padding-bottom: 0.1rem;
 }
 
 /* Nav links */

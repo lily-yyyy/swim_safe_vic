@@ -34,7 +34,7 @@
             <router-link class="nav-link text-white" to="/">Home</router-link>
           </li>
           <li class="nav-item">
-            <router-link class="nav-link text-white" to="/swim">Water Map</router-link>
+            <router-link class="nav-link text-white" to="/swim">Water Quality Checker</router-link>
           </li>
           <!-- <li class="nav-item">
             <router-link class="nav-link text-white" to="/about">About</router-link>

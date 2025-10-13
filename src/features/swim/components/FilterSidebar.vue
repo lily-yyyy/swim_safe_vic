@@ -90,16 +90,18 @@ function toggleMobileSidebar() {
 
     <!-- Sidebar -->
     <div 
-      class="filter-sidebar"
+      class="filter-sidebar"  
       :class="{ 'mobile-open': isMobileOpen }"
     >
+      <h2 class="text-center fw-bold mb-2">Water Quality Map</h2>
       <div class="instruction-banner">
+        <h7 class="text-center">With this map, you can check real-time water quality, get directions to locations, add to planner to get alerts, and rate public toilts. </h7>
         <h6 class="instruction-title">How to Use</h6>
-        <ol class="instruction-steps">
+        <ol class="text">
           <li>Type and search for a beach or river</li>
           <li>Apply filters to narrow results</li>
           <li>Filter amenities</li>
-          <li>Click on map markers for details</li>
+          <li>Click on map markers for water quality</li>
         </ol>
       </div>
 
@@ -304,6 +306,31 @@ function toggleMobileSidebar() {
   }
 }
 
+/* Introduction Section */
+
+.intro-features {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.intro-features li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: #555;
+  padding: 6px 0;
+  line-height: 1.3;
+}
+
+.intro-features li img {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  opacity: 0.8;
+}
+
 /* Instruction Banner */
 .instruction-banner {
   background: linear-gradient(135deg, #5fd5c1 0%, #4fc4b0 100%);
@@ -315,6 +342,7 @@ function toggleMobileSidebar() {
 
 .instruction-title {
   font-weight: bold;
+  margin-top: 8px;
   margin-bottom: 8px;
   font-size: 16px;
 }

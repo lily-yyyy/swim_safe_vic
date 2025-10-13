@@ -46,13 +46,13 @@
       </div>
 
       <!-- Right: Planner Button (ONLY on /home page) -->
-      <button
+      <!-- <button
         v-if="route.path === '/'"
         class="btn btn-outline-warning ms-3 d-none d-lg-block"
         @click="$emit('open-planner')"
       >
         Planner
-      </button>
+      </button> -->
     </div>
   </nav>
 </template>

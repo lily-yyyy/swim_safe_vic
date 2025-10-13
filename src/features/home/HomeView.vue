@@ -6,7 +6,6 @@ import BaseButton from '@/components/ui/BaseButton.vue'
 import Planner from './components/Planer.vue'
 
 import videoSrc from '@/assets/video/background_video.mp4'
-// import videoSrc from '@/assets/video/bgv.mov'
 
 const showDialog = ref(false)
 const videoLoaded = ref(false)
@@ -23,13 +22,17 @@ const scrollToNextSection = () => {
   const nextSection = document.querySelector('.py-5.bg-light')
   nextSection?.scrollIntoView({ behavior: 'smooth' })
 }
+
+function openPlanner() {
+  showDialog.value = true
+}
 </script>
 
 <template>
   <div class="container-fluid p-0 home-view">
     <!-- Planner -->
-    <BaseButton label="Planner" @click="showDialog = true" />
-    <Planner v-if="showDialog" @close="showDialog = false" />
+    <!-- <BaseButton label="Planner" @click="showDialog = true" />
+    <Planner v-if="showDialog" @close="showDialog = false" /> -->
     
     <!-- Hero Section with Cards -->
     <section class="hero-section">
@@ -92,12 +95,12 @@ const scrollToNextSection = () => {
                 <div class="card-content">
                   <h5 class="card-title">Step 2: Check Water Quality and Plan</h5>
                   <p class="card-description">
-                    Real-time safety indicators for beaches & rivers. User our planner to get email notification of changed water quality.
+                    Real-time safety indicators for beaches & rivers. Use our planner to get email notification of changed water quality.
                   </p>
                   <button class="card-button card-button-primary" @click="goToSwimMap">
                     Water Quality Map
                   </button>
-                  <button class="card-button card-button-primary" @click="goToSwimMap">
+                  <button class="card-button card-button-primary" @click="openPlanner">
                     Planner
                   </button>
                 </div>
@@ -125,6 +128,8 @@ const scrollToNextSection = () => {
         </div>
       </div>
     </section>
+
+    <Planner v-if="showDialog" @close="showDialog = false" />
   </div>
 </template>
 

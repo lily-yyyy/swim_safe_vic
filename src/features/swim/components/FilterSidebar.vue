@@ -95,10 +95,23 @@ function toggleMobileSidebar() {
       style="background: linear-gradient(to bottom, #d0f4f4 0%, white 100%)"
     >
       <h2 class="text-center fw-bold mb-2">Water Quality Map</h2>
-      <div class="instruction-banner">
+
+      <!-- <div class="instruction-banner">
         <h7 class=" lead text-center">With this map, you can check real-time water quality, get directions to locations, add to planner to get alerts, and rate public toilts. </h7>
         <h6 class="instruction-title lead">How to Use</h6>
         <ol class="text-muted mb-4">
+          <li>Type and search for a beach or river</li>
+          <li>Apply filters to narrow results</li>
+          <li>Filter amenities</li>
+          <li>Click on map markers for water quality</li>
+        </ol>
+      </div> -->
+      <div class="instruction-banner">
+        <p class="intro-text text-center mb-3">
+          Check real-time water quality, get directions, add to planner for alerts, and rate public toilets.
+        </p>
+        <h6 class="instruction-title">How to Use</h6>
+        <ol class="instruction-steps">
           <li>Type and search for a beach or river</li>
           <li>Apply filters to narrow results</li>
           <li>Filter amenities</li>
@@ -155,15 +168,15 @@ function toggleMobileSidebar() {
         <label>Water Quality</label>
         <div class="btn-group">
           <button class="btn" :class="{ active: filters.waterQuality === 'clean' }" @click="setFilter('waterQuality', 'clean')">
-            <img src="@/assets/icons/excellent.png" />
+            <img src="@/assets/icons/green.png" />
             Clean
           </button>
           <button class="btn" :class="{ active: filters.waterQuality === 'moderate' }" @click="setFilter('waterQuality', 'moderate')">
-            <img src="@/assets/icons/moderate.png" />
+            <img src="@/assets/icons/yellow.png" />
             Moderate
           </button>
           <button class="btn" :class="{ active: filters.waterQuality === 'unclean' }" @click="setFilter('waterQuality', 'unclean')">
-            <img src="@/assets/icons/verypoor.png" />
+            <img src="@/assets/icons/red.png" />
             Unclean
           </button>
         </div>
@@ -334,30 +347,45 @@ function toggleMobileSidebar() {
 
 /* Instruction Banner */
 .instruction-banner {
-  /* background: linear-gradient(135deg, #5fd5c1 0%, #4fc4b0 100%); */
   background-color: white;
-  color: black;
-  padding: 16px;
-  border-radius: 8px;
-  margin-bottom: 8px;
+  color: #333;
+  padding: 20px 16px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.intro-text {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 16px;
 }
 
 .instruction-title {
-  font-weight: bold;
-  margin-top: 8px;
-  margin-bottom: 8px;
-  font-size: 16px;
+  font-weight: 700;
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 15px;
+  color: #333;
+  padding-bottom: 6px;
 }
 
 .instruction-steps {
   margin: 0;
   padding-left: 20px;
   font-size: 13px;
-  line-height: 1.6;
+  line-height: 1.8;
+  color: #666;
 }
 
 .instruction-steps li {
-  margin-bottom: 4px;
+  margin-bottom: 6px;
+}
+
+.instruction-steps li:last-child {
+  margin-bottom: 0;
 }
 
 /* Scrollbar */

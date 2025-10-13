@@ -287,7 +287,7 @@ function handleSearchSelected(location) {
     left: 0;
     width: 400px;
     height: 100vh;
-    background: white;
+    background: linear-gradient(to bottom, #d0f4f4 0%, white 100%);
     padding: 16px;
     padding-top: 96px;
     border-radius: 0 8px 8px 0;

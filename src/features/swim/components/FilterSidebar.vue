@@ -92,6 +92,7 @@ function toggleMobileSidebar() {
     <div 
       class="filter-sidebar"  
       :class="{ 'mobile-open': isMobileOpen }"
+      style="background: linear-gradient(to bottom, #d0f4f4 0%, white 100%)"
     >
       <h2 class="text-center fw-bold mb-2">Water Quality Map</h2>
       <div class="instruction-banner">
@@ -333,8 +334,9 @@ function toggleMobileSidebar() {
 
 /* Instruction Banner */
 .instruction-banner {
-  background: linear-gradient(135deg, #5fd5c1 0%, #4fc4b0 100%);
-  color: white;
+  /* background: linear-gradient(135deg, #5fd5c1 0%, #4fc4b0 100%); */
+  background-color: white;
+  color: black;
   padding: 16px;
   border-radius: 8px;
   margin-bottom: 8px;
@@ -461,8 +463,9 @@ label {
 }
 
 .btn {
-  background: #f5f5f5;
-  border: 1px solid #ccc;
+  /* background: #f5f5f5; */
+  background: white;
+  border: 1px solid #dedddd;
   border-radius: 6px;
   padding: 6px 12px;
   cursor: pointer;
@@ -479,7 +482,8 @@ label {
 }
 
 .btn:hover {
-  background: #e8e8e8;
+  /* background: #e8e8e8; */
+  background: #f5f5f5;
 }
 
 .btn.active {

@@ -2,7 +2,7 @@
 <script setup>
 import { ref, reactive, watch } from 'vue'
 
-const emit = defineEmits(['update:filters', 'update:search', 'search-selected'])
+const emit = defineEmits(['update:filters', 'update:search', 'search-selected', 'result-clicked'])
 
 const props = defineProps({
   results: {
@@ -67,6 +67,14 @@ function resetFilters() {
 function toggleMobileSidebar() {
   isMobileOpen.value = !isMobileOpen.value
 }
+
+// Select result from the list
+function selectResult(item) {
+  emit('result-clicked', item)
+  // Close mobile sidebar after selection
+  isMobileOpen.value = false
+}
+
 </script>
 
 <template>
@@ -96,16 +104,6 @@ function toggleMobileSidebar() {
     >
       <h2 class="text-center fw-bold mb-2">Water Quality Map</h2>
 
-      <!-- <div class="instruction-banner">
-        <h7 class=" lead text-center">With this map, you can check real-time water quality, get directions to locations, add to planner to get alerts, and rate public toilts. </h7>
-        <h6 class="instruction-title lead">How to Use</h6>
-        <ol class="text-muted mb-4">
-          <li>Type and search for a beach or river</li>
-          <li>Apply filters to narrow results</li>
-          <li>Filter amenities</li>
-          <li>Click on map markers for water quality</li>
-        </ol>
-      </div> -->
       <div class="instruction-banner">
         <p class="intro-text text-center mb-3">
           Check real-time water quality, get directions, add to planner for alerts, and rate public toilets.
@@ -214,15 +212,19 @@ function toggleMobileSidebar() {
           <button class="reset-btn" @click="resetFilters">Reset</button>
         </div>
 
+        <!-- Results Count -->
+        <div v-if="props.results.length > 0" class="mb-2">
+          {{ props.results.length }} {{ props.results.length === 1 ? 'result' : 'results' }} found
+        </div>
+
         <!-- Show result list if there are matches -->
         <div v-if="props.results.length > 0">
-          <div v-for="(res, i) in props.results" :key="i" class="result-item">
+          <div v-for="(res, i) in props.results" :key="i" class="result-item" @click="selectResult(res)">
             <div class="result-header">
-              <img src="@/assets/icons/menu.svg" />
               <strong>{{ res.name }}</strong>
             </div>
-            <div :class="['status', res.status?.toLowerCase()]">{{ res.status }}</div>
-            <p>{{ res.description }}</p>
+            <!-- <div :class="['status', res.status?.toLowerCase()]">{{ res.status }}</div>
+            <p>{{ res.description }}</p> -->
           </div>
         </div>
 
@@ -521,6 +523,7 @@ label {
 }
 
 /* Results */
+/* Results Count */
 .result-item {
   background: #f9f9f9;
   padding: 10px;
@@ -528,11 +531,13 @@ label {
   margin-bottom: 8px;
   font-size: 14px;
   border: 1px solid #e0e0e0;
-  transition: box-shadow 0.2s;
+  transition: box-shadow 0.2s, transform 0.2s;
+  cursor: pointer;
 }
 
 .result-item:hover {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: white;
 }
 
 .result-header {

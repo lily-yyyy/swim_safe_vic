@@ -102,24 +102,70 @@ async function loadLocations() {
     const rivers = await getAllRivers()
 
     allLocations.value = [
-      ...beaches.map(b => ({
-        ...b,
-        type: 'beach',
-        name: b.name,
-        description: b.description_tips || 'No description.',
-        status: b.status || 'Unknown',
-        lat: b.lat,
-        lon: b.lon
-      })),
-      ...rivers.map(r => ({
-        ...r,
-        type: 'river',
-        name: r.name,
-        description: r.description || 'No description.',
-        status: r.status || 'Unknown',
-        lat: r.lat,
-        lon: r.lon
-      }))
+      // ===== BEACHES: Transform status to match SwimMap =====
+      ...beaches.map(b => {
+        const prediction = b.predicted || {}
+        const enterococci = prediction.enterococci || b.avg_enterococci || 0
+        const mlCategory = prediction.category // 'green', 'amber', 'red'
+        
+        // ✅ UNIFIED: Same logic as SwimMap
+        let status, statusLabel
+        if (mlCategory === 'green' || enterococci <= 40) {
+          status = 'Excellent'
+          statusLabel = 'Clean for Swimming'
+        } else if (mlCategory === 'amber' || enterococci <= 200) {
+          status = 'Moderate'
+          statusLabel = 'Caution Advised'
+        } else {
+          status = 'Poor'
+          statusLabel = 'Avoid Swimming'
+        }
+        
+        return {
+          ...b,
+          type: 'beach',
+          name: b.name,
+          description: b.description_tips || 'No description.',
+          status, // ✅ Now: 'Excellent' | 'Moderate' | 'Poor'
+          statusLabel,
+          enterococci,
+          mlCategory,
+          rainfall_mm: prediction.rainfall_mm || 0,
+          temperature: prediction.temp_c,
+          prediction_timestamp: prediction.timestamp,
+          predicted: b.predicted, // Keep whole object for InfoDialog
+          is_pet_friendly: b.is_pet_friendly,
+          lat: b.lat,
+          lon: b.lon,
+          // Extra data for InfoDialog
+          extraInfo: {
+            rainfallLast3Days: prediction.rainfall_mm || 0,
+            dataSource: prediction.enterococci ? 'ML Prediction' : 'Historical Average'
+          }
+        }
+      }),
+      
+      // ===== RIVERS: Transform status to match SwimMap =====
+      ...rivers.map(r => {
+        const predicted = r.predicted || {}
+        const status = predicted.category || 'Poor' // "Excellent" | "Good" | "Moderate" | "Poor" | "Very Poor"
+        const wqi = predicted.wqi ?? null
+        
+        return {
+          ...r,
+          type: 'river',
+          name: r.name,
+          description: r.description || 'No description.',
+          status, // ✅ Already correct: 'Excellent' | 'Good' | 'Moderate' | 'Poor' | 'Very Poor'
+          wqi,
+          rainfall_mm: predicted.rainfall_mm,
+          temperature: predicted.temp_c,
+          prediction_timestamp: predicted.timestamp,
+          predicted: r.predicted, // Keep whole object for InfoDialog
+          lat: r.lat,
+          lon: r.lon
+        }
+      })
     ]
   } catch (e) {
     console.error('Error loading locations:', e)
@@ -213,6 +259,41 @@ function handleSearchSelected(location) {
     zoomTo: true
   }
 }
+
+
+// ----------------------
+// Result item clicked
+// ----------------------
+async function handleResultClicked(location) {
+  try {
+    // Fetch weather data just like when clicking a marker
+    const weather = await getWeatherByCoords(location.lat, location.lon)
+    location.temperature = weather?.main?.temp ?? 'N/A'
+
+    // Set the selected location to show InfoDialog
+    selectedLocation.value = {
+      ...location,
+      type: location.type,
+      getDirections: `https://www.google.com/maps/dir/?api=1&destination=${location.lat},${location.lon}`
+    }
+    
+    selectedToilet.value = null
+    
+    // Clear search query (optional - keeps sidebar clean)
+    // searchQuery.value = ''
+  } catch (err) {
+    console.error('Error fetching location details:', err)
+    
+    // Even if weather fails, still show the dialog
+    selectedLocation.value = {
+      ...location,
+      type: location.type,
+      temperature: 'N/A',
+      getDirections: `https://www.google.com/maps/dir/?api=1&destination=${location.lat},${location.lon}`
+    }
+    selectedToilet.value = null
+  }
+}
 </script>
 
 <template>
@@ -233,6 +314,7 @@ function handleSearchSelected(location) {
           @update:filters="handleFilterChange"
           @update:search="handleSearchUpdate"
           @search-selected="handleSearchSelected"
+          @result-clicked="handleResultClicked"
         />
       </div>
 

@@ -207,6 +207,83 @@ function isDateTimeValidForSubmit() {
   return true
 }
 
+// async function submitForm() {
+//   if (!selectedDate.value || !selectedTime.value) {
+//     alert('Please complete all fields')
+//     return
+//   }
+
+//   // Final guard
+//   if (!isDateTimeValidForSubmit()) {
+//     enforceFutureTime()
+//     alert('Please choose a date/time in the future.')
+//     return
+//   }
+
+//   // If user never touched dropdowns → fallback to initial values
+//   const finalPlaceType = placeType.value || props.initialPlaceType
+//   const finalPlaceId = placeId.value || props.initialPlaceId
+
+//   if (!finalPlaceId) {
+//     alert('No location selected')
+//     return
+//   }
+
+//   // Create user if needed
+//   if (!userId.value) {
+//     if (!validateEmail(userEmail.value)) {
+//       alert('Please enter a valid email.')
+//       return
+//     }
+    
+//     try {
+//       // Search for existing user (now returns null if not found, not an error)
+//       const existingUser = await searchUserByEmail(userEmail.value)
+      
+//       if (existingUser && existingUser.user_id) {
+//         // User exists
+//         userId.value = existingUser.user_id
+//       } else {
+//         // User doesn't exist, create new one
+//         const newUser = await createUser(userEmail.value)
+//         if (!newUser || !newUser.user_id) {
+//           alert('Failed to create user account. Please try again.')
+//           return
+//         }
+//         userId.value = newUser.user_id
+//       }
+      
+//       // Save to localStorage
+//       localStorage.setItem('user_email', userEmail.value)
+//       localStorage.setItem('user_id', userId.value)
+      
+//     } catch (err) {
+//       console.error('User verification/creation failed:', err)
+//       alert('Error processing user information. Please try again.')
+//       return
+//     }
+//   }
+
+//   // Build payload
+//   const payload = {
+//     user_id: parseInt(userId.value),
+//     booking_datetime: `${selectedDate.value}T${selectedTime.value}:00`,
+//     place_type: finalPlaceType,
+//     place_id: parseInt(finalPlaceId),
+//     is_email_sent: false
+//   }
+
+//   console.log('📋 Notification Payload:', payload)
+
+//   try {
+//     await createNotification(payload)
+//     alert('Visit planned successfully!')
+//     handleClose()
+//   } catch (error) {
+//     console.error('❌ Submission Error:', error)
+//     alert('Failed to submit booking.')
+//   }
+// }
 async function submitForm() {
   if (!selectedDate.value || !selectedTime.value) {
     alert('Please complete all fields')
@@ -235,21 +312,53 @@ async function submitForm() {
       alert('Please enter a valid email.')
       return
     }
+    
     try {
+      console.log('🔍 Step 1: Searching for user with email:', userEmail.value)
+      
+      // Search for existing user
       const existingUser = await searchUserByEmail(userEmail.value)
+      console.log('🔍 Step 2: Search result:', existingUser)
+      
       if (existingUser && existingUser.user_id) {
+        // User exists
+        console.log('✅ Found existing user:', existingUser.user_id)
         userId.value = existingUser.user_id
       } else {
-        const newUser = await createUser(userEmail.value)
-        userId.value = newUser?.user_id
+        // User doesn't exist, create new one
+        console.log('➕ Step 3: Creating new user...')
+        const newUserResponse = await createUser(userEmail.value)
+        console.log('➕ Step 4: Create user result:', newUserResponse)
+        
+        // Extract user data from the response structure
+        const newUser = newUserResponse?.data
+        
+        if (!newUser || !newUser.user_id) {
+          console.error('❌ New user object is invalid:', newUser)
+          alert('Failed to create user account. Please try again.')
+          return
+        }
+        userId.value = newUser.user_id
+        console.log('✅ New user created with ID:', userId.value)
       }
+      
+      // Save to localStorage
       localStorage.setItem('user_email', userEmail.value)
       localStorage.setItem('user_id', userId.value)
+      console.log('💾 Saved to localStorage')
+      
     } catch (err) {
-      console.error(' User fetch/create failed:', err)
-      alert('Error verifying user. Please try again.')
+      console.error('❌ CAUGHT ERROR:', err)
+      console.error('❌ Error details:', {
+        message: err.message,
+        stack: err.stack,
+        response: err.response
+      })
+      alert('Error processing user information. Please try again.')
       return
     }
+  } else {
+    console.log('ℹ️ Using existing userId from state:', userId.value)
   }
 
   // Build payload
@@ -261,14 +370,14 @@ async function submitForm() {
     is_email_sent: false
   }
 
-  console.log(' Notification Payload:', payload)
+  console.log('📋 Notification Payload:', payload)
 
   try {
     await createNotification(payload)
     alert('Visit planned successfully!')
     handleClose()
   } catch (error) {
-    console.error(' Submission Error:', error)
+    console.error('❌ Submission Error:', error)
     alert('Failed to submit booking.')
   }
 }

@@ -102,7 +102,7 @@ function selectResult(item) {
       :class="{ 'mobile-open': isMobileOpen }"
       style="background: linear-gradient(to bottom, #d0f4f4 0%, white 100%)"
     >
-      <h2 class="text-center fw-bold mb-2">Water Quality Map</h2>
+      <h2 class="text-center text-muted fw-bold mb-2">Water Quality Map</h2>
 
       <div class="instruction-banner">
         <p class="intro-text text-center mb-3">

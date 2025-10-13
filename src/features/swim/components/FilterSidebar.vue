@@ -96,9 +96,9 @@ function toggleMobileSidebar() {
     >
       <h2 class="text-center fw-bold mb-2">Water Quality Map</h2>
       <div class="instruction-banner">
-        <h7 class="text-center">With this map, you can check real-time water quality, get directions to locations, add to planner to get alerts, and rate public toilts. </h7>
-        <h6 class="instruction-title">How to Use</h6>
-        <ol class="text">
+        <h7 class=" lead text-center">With this map, you can check real-time water quality, get directions to locations, add to planner to get alerts, and rate public toilts. </h7>
+        <h6 class="instruction-title lead">How to Use</h6>
+        <ol class="text-muted mb-4">
           <li>Type and search for a beach or river</li>
           <li>Apply filters to narrow results</li>
           <li>Filter amenities</li>

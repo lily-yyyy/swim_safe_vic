@@ -350,7 +350,7 @@ function openPlanner() {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 10px rgba(95, 213, 193, 0.3);
+  /* box-shadow: 0 4px 10px rgba(95, 213, 193, 0.3); */
 }
 
 .card-button:hover {

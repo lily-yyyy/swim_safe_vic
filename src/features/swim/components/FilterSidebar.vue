@@ -11,6 +11,9 @@ const props = defineProps({
   }
 })
 
+// Mobile sidebar toggle
+const isMobileOpen = ref(false)
+
 // Filters
 const filters = reactive({
   showOnMap: 'all',
@@ -23,12 +26,12 @@ const filters = reactive({
 // Search query
 const searchQuery = ref('')
 
-//  Emit search input
+// Emit search input
 watch(searchQuery, () => {
   emit('update:search', searchQuery.value)
 })
 
-//  Emit filters when updated
+// Emit filters when updated
 watch(filters, () => {
   emit('update:filters', { ...filters })
 }, { deep: true })
@@ -47,9 +50,11 @@ function toggleAmenity(value) {
 function selectSuggestion(item) {
   emit('search-selected', item)
   searchQuery.value = item.name
+  // Close mobile sidebar after selection
+  isMobileOpen.value = false
 }
 
-//  Reset all filters + search
+// Reset all filters + search
 function resetFilters() {
   filters.showOnMap = 'all'
   filters.waterQuality = null
@@ -58,142 +63,209 @@ function resetFilters() {
   filters.toiletAccessibility = null
   searchQuery.value = ''
 }
+
+function toggleMobileSidebar() {
+  isMobileOpen.value = !isMobileOpen.value
+}
 </script>
 
 <template>
-  <div class="filter-sidebar">
-    <div class="instruction-banner">
-      <h6 class="instruction-title">How to Use</h6>
-      <ol class="instruction-steps">
-        <li>Type and search for a beach or river</li>
-        <li>Apply filters to narrow results</li>
-        <li>Filter amenities</li>
-        <li>Click on map markers for details</li>
-      </ol>
-    </div>
-    <!--  Search -->
-    <div class="search-container">
-      <img src="@/assets/icons/search.svg" class="search-icon" />
-      <input
-        v-model="searchQuery"
-        class="search-input"
-        type="text"
-        placeholder="Search beach, river location"
-      />
+  <div>
+    <!-- Mobile Toggle Button -->
+    <button 
+      class="mobile-toggle-btn d-lg-none" 
+      @click="toggleMobileSidebar"
+      :class="{ open: isMobileOpen }"
+    >
+      <span v-if="!isMobileOpen">☰ Filters & Search</span>
+      <span v-else>✕ Close</span>
+    </button>
 
-      <!--  Search Suggestions -->
-      <ul v-if="searchQuery && props.results.length" class="search-suggestions">
-        <li
-          v-for="(item, index) in props.results"
-          :key="index"
-          @click="selectSuggestion(item)"
-        >
-          {{ item.name }}
-        </li>
-      </ul>
-    </div>
+    <!-- Backdrop for mobile -->
+    <div 
+      v-if="isMobileOpen" 
+      class="mobile-backdrop d-lg-none"
+      @click="isMobileOpen = false"
+    ></div>
 
-    <!--  Filters -->
-    <h5>Filters</h5>
-
-    <!-- Show on Map -->
-    <section>
-      <label>Show on Map</label>
-      <div class="btn-group">
-        <button class="btn" :class="{ active: filters.showOnMap === 'all' }" @click="setFilter('showOnMap', 'all')">
-          <img src="@/assets/icons/all.png" />
-          All Swim
-        </button>
-        <button class="btn" :class="{ active: filters.showOnMap === 'river' }" @click="setFilter('showOnMap', 'river')">
-          <img src="@/assets/icons/r.png" />
-          River
-        </button>
-        <button class="btn" :class="{ active: filters.showOnMap === 'beach' }" @click="setFilter('showOnMap', 'beach')">
-          <img src="@/assets/icons/b.png" />
-          Beach
-        </button>
-      </div>
-    </section>
-
-    <!-- Water Quality -->
-    <section>
-      <label>Water Quality</label>
-      <div class="btn-group">
-        <button class="btn" :class="{ active: filters.waterQuality === 'clean' }" @click="setFilter('waterQuality', 'clean')">
-          <img src="@/assets/icons/excellent.png" />
-          Clean
-        </button>
-        <button class="btn" :class="{ active: filters.waterQuality === 'moderate' }" @click="setFilter('waterQuality', 'moderate')">
-          <img src="@/assets/icons/moderate.png" />
-          Moderate
-        </button>
-        <button class="btn" :class="{ active: filters.waterQuality === 'unclean' }" @click="setFilter('waterQuality', 'unclean')">
-          <img src="@/assets/icons/verypoor.png" />
-          Unclean
-        </button>
-      </div>
-    </section>
-
-    <!--  Distance -->
-    <section>
-      <label>Distance</label>
-      <div class="btn-group">
-        <button class="btn" :class="{ active: filters.distance === '1' }" @click="setFilter('distance', '1')">1 km</button>
-        <button class="btn" :class="{ active: filters.distance === '5' }" @click="setFilter('distance', '5')">5 km</button>
-        <button class="btn" :class="{ active: filters.distance === '10' }" @click="setFilter('distance', '10')">10 km</button>
-      </div>
-    </section>
-
-    <!-- Amenities -->
-    <section>
-      <label>Amenities</label>
-      <div class="btn-group">
-        <button class="btn" :class="{ active: filters.amenities.includes('toilets') }" @click="toggleAmenity('toilets')">
-          <img src="@/assets/icons/toilet3.png" />
-          Toilets
-        </button>
-        <button class="btn" :class="{ active: filters.amenities.includes('fountains') }" @click="toggleAmenity('fountains')">
-          <img src="@/assets/icons/fountains3.png" />
-          Fountains
-        </button>
-      </div>
-    </section>
-
-   <!-- Results -->
-    <section>
-      <div class="d-flex justify-content-between align-items-center mb-2">
-        <label>Results</label>
-        <button class="reset-btn" @click="resetFilters">Reset</button>
+    <!-- Sidebar -->
+    <div 
+      class="filter-sidebar"
+      :class="{ 'mobile-open': isMobileOpen }"
+    >
+      <div class="instruction-banner">
+        <h6 class="instruction-title">How to Use</h6>
+        <ol class="instruction-steps">
+          <li>Type and search for a beach or river</li>
+          <li>Apply filters to narrow results</li>
+          <li>Filter amenities</li>
+          <li>Click on map markers for details</li>
+        </ol>
       </div>
 
-      <!--  Show result list if there are matches -->
-      <div v-if="props.results.length > 0">
-        <div v-for="(res, i) in props.results" :key="i" class="result-item">
-          <div class="result-header">
-            <img src="@/assets/icons/menu.svg" />
-            <strong>{{ res.name }}</strong>
-          </div>
-          <div :class="['status', res.status?.toLowerCase()]">{{ res.status }}</div>
-          <p>{{ res.description }}</p>
+      <!-- Search -->
+      <div class="search-container">
+        <img src="@/assets/icons/search.svg" class="search-icon" />
+        <input
+          v-model="searchQuery"
+          class="search-input"
+          type="text"
+          placeholder="Search beach, river location"
+        />
+
+        <!-- Search Suggestions -->
+        <ul v-if="searchQuery && props.results.length" class="search-suggestions">
+          <li
+            v-for="(item, index) in props.results"
+            :key="index"
+            @click="selectSuggestion(item)"
+          >
+            {{ item.name }}
+          </li>
+        </ul>
+      </div>
+
+      <!-- Filters -->
+      <h5>Filters</h5>
+
+      <!-- Show on Map -->
+      <section>
+        <label>Show on Map</label>
+        <div class="btn-group">
+          <button class="btn" :class="{ active: filters.showOnMap === 'all' }" @click="setFilter('showOnMap', 'all')">
+            <img src="@/assets/icons/all.png" />
+            All Swim
+          </button>
+          <button class="btn" :class="{ active: filters.showOnMap === 'river' }" @click="setFilter('showOnMap', 'river')">
+            <img src="@/assets/icons/r.png" />
+            River
+          </button>
+          <button class="btn" :class="{ active: filters.showOnMap === 'beach' }" @click="setFilter('showOnMap', 'beach')">
+            <img src="@/assets/icons/b.png" />
+            Beach
+          </button>
         </div>
-      </div>
+      </section>
 
-      <!--  No results but search/filters applied -->
-      <div v-else-if="searchQuery || filters.showOnMap !== 'all' || filters.waterQuality || filters.distance || filters.amenities.length > 0 || filters.toiletAccessibility">
-        <img src="@/assets/icons/noresult.png" alt="No results" class="empty-icon-img" />
-        <strong class="no-results">No results match your filters or search.</strong>
-      </div>
+      <!-- Water Quality -->
+      <section>
+        <label>Water Quality</label>
+        <div class="btn-group">
+          <button class="btn" :class="{ active: filters.waterQuality === 'clean' }" @click="setFilter('waterQuality', 'clean')">
+            <img src="@/assets/icons/excellent.png" />
+            Clean
+          </button>
+          <button class="btn" :class="{ active: filters.waterQuality === 'moderate' }" @click="setFilter('waterQuality', 'moderate')">
+            <img src="@/assets/icons/moderate.png" />
+            Moderate
+          </button>
+          <button class="btn" :class="{ active: filters.waterQuality === 'unclean' }" @click="setFilter('waterQuality', 'unclean')">
+            <img src="@/assets/icons/verypoor.png" />
+            Unclean
+          </button>
+        </div>
+      </section>
 
-      <!--  Default state: nothing searched yet -->
-      <div v-else>
-        <img src="@/assets/icons/search.svg" alt="Search" class="empty-icon-img" />
-        <strong class="no-results">Please search to find results.</strong>
-      </div>
-    </section>
+      <!-- Distance -->
+      <section>
+        <label>Distance</label>
+        <div class="btn-group">
+          <button class="btn" :class="{ active: filters.distance === '1' }" @click="setFilter('distance', '1')">1 km</button>
+          <button class="btn" :class="{ active: filters.distance === '5' }" @click="setFilter('distance', '5')">5 km</button>
+          <button class="btn" :class="{ active: filters.distance === '10' }" @click="setFilter('distance', '10')">10 km</button>
+        </div>
+      </section>
+
+      <!-- Amenities -->
+      <section>
+        <label>Amenities</label>
+        <div class="btn-group">
+          <button class="btn" :class="{ active: filters.amenities.includes('toilets') }" @click="toggleAmenity('toilets')">
+            <img src="@/assets/icons/toilet3.png" />
+            Toilets
+          </button>
+          <button class="btn" :class="{ active: filters.amenities.includes('fountains') }" @click="toggleAmenity('fountains')">
+            <img src="@/assets/icons/fountains3.png" />
+            Fountains
+          </button>
+        </div>
+      </section>
+
+      <!-- Results -->
+      <section>
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <label>Results</label>
+          <button class="reset-btn" @click="resetFilters">Reset</button>
+        </div>
+
+        <!-- Show result list if there are matches -->
+        <div v-if="props.results.length > 0">
+          <div v-for="(res, i) in props.results" :key="i" class="result-item">
+            <div class="result-header">
+              <img src="@/assets/icons/menu.svg" />
+              <strong>{{ res.name }}</strong>
+            </div>
+            <div :class="['status', res.status?.toLowerCase()]">{{ res.status }}</div>
+            <p>{{ res.description }}</p>
+          </div>
+        </div>
+
+        <!-- No results but search/filters applied -->
+        <div v-else-if="searchQuery || filters.showOnMap !== 'all' || filters.waterQuality || filters.distance || filters.amenities.length > 0 || filters.toiletAccessibility">
+          <img src="@/assets/icons/noresult.png" alt="No results" class="empty-icon-img" />
+          <strong class="no-results">No results match your filters or search.</strong>
+        </div>
+
+        <!-- Default state: nothing searched yet -->
+        <div v-else>
+          <img src="@/assets/icons/search.svg" alt="Search" class="empty-icon-img" />
+          <strong class="no-results">Please search to find results.</strong>
+        </div>
+      </section>
+    </div>
   </div>
 </template>
 
 <style scoped>
+/* Mobile Toggle Button */
+.mobile-toggle-btn {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1001;
+  background: #5fd5c1;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 25px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.mobile-toggle-btn:hover {
+  background: #4fc4b0;
+  transform: translateX(-50%) scale(1.05);
+}
+
+.mobile-toggle-btn.open {
+  background: #333;
+}
+
+/* Mobile Backdrop */
+.mobile-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+/* Sidebar */
 .filter-sidebar {
   display: flex;
   flex-direction: column;
@@ -202,26 +274,86 @@ function resetFilters() {
   height: 100vh;
   padding-bottom: 20px;
   padding-right: 6px;
+  background: white;
+}
+
+/* Desktop: normal sidebar */
+@media (min-width: 769px) {
+  .filter-sidebar {
+    position: relative;
+  }
+}
+
+/* Mobile: slide-in sidebar */
+@media (max-width: 768px) {
+  .filter-sidebar {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 85%;
+    max-width: 350px;
+    height: 100vh;
+    z-index: 1000;
+    padding: 20px;
+    transition: left 0.3s ease;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .filter-sidebar.mobile-open {
+    left: 0;
+  }
+}
+
+/* Instruction Banner */
+.instruction-banner {
+  background: linear-gradient(135deg, #5fd5c1 0%, #4fc4b0 100%);
+  color: white;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.instruction-title {
+  font-weight: bold;
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+
+.instruction-steps {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.instruction-steps li {
+  margin-bottom: 4px;
 }
 
 /* Scrollbar */
 .filter-sidebar::-webkit-scrollbar {
-  width: 0px;
+  width: 6px;
 }
 
+.filter-sidebar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
 
-/* Mobile scroll */
-@media (max-width: 768px) {
-  .filter-sidebar {
-    padding: 12px;
-    font-size: 14px;
-  }
+.filter-sidebar::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+.filter-sidebar::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
 
 /* Header */
 h5 {
   font-weight: bold;
   margin-bottom: 0;
+  color: #333;
 }
 
 /* Section */
@@ -233,6 +365,7 @@ label {
   font-weight: 600;
   margin-bottom: 6px;
   display: block;
+  color: #555;
 }
 
 /* Search */
@@ -246,6 +379,12 @@ label {
   border-radius: 8px;
   font-size: 14px;
   width: 100%;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #5fd5c1;
+  box-shadow: 0 0 0 3px rgba(95, 213, 193, 0.1);
 }
 
 .search-icon {
@@ -264,19 +403,22 @@ label {
   left: 0;
   background: white;
   border: 1px solid #ccc;
+  border-radius: 8px;
   width: 100%;
   z-index: 10;
   max-height: 200px;
   overflow-y: auto;
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin: 4px 0 0 0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .search-suggestions li {
   padding: 10px;
   cursor: pointer;
   font-size: 14px;
+  transition: background 0.2s;
 }
 
 .search-suggestions li:hover {
@@ -308,25 +450,36 @@ label {
   height: 16px;
 }
 
+.btn:hover {
+  background: #e8e8e8;
+}
+
 .btn.active {
   background-color: #5fd5c1;
   border-color: #5fd5c1;
   color: white;
 }
 
-/* 🧾 Results */
+/* Results */
 .result-item {
   background: #f9f9f9;
   padding: 10px;
   border-radius: 6px;
   margin-bottom: 8px;
   font-size: 14px;
+  border: 1px solid #e0e0e0;
+  transition: box-shadow 0.2s;
+}
+
+.result-item:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .result-header {
   display: flex;
   align-items: center;
   gap: 8px;
+  margin-bottom: 4px;
 }
 
 .result-header img {
@@ -341,6 +494,7 @@ label {
   font-size: 12px;
   margin-top: 4px;
   margin-bottom: 6px;
+  font-weight: 600;
 }
 
 .status.clean {
@@ -358,19 +512,23 @@ label {
   color: #856404;
 }
 
-/* Reset Button */
-/* .empty-state-custom {
-  text-align: center;
-  padding: 20px;
-} */
-
 .empty-icon-img {
-  width: 20px;
-  height: 20px;
-  margin: 12px;
-  opacity: 0.6;
+  width: 40px;
+  height: 40px;
+  display: block;
+  margin: 20px auto 12px;
+  opacity: 0.4;
 }
 
+.no-results {
+  display: block;
+  text-align: center;
+  font-size: 14px;
+  color: #666;
+  padding: 10px;
+}
+
+/* Reset Button */
 .reset-btn {
   background: transparent;
   border: 1px solid #999;
@@ -379,19 +537,11 @@ label {
   border-radius: 6px;
   cursor: pointer;
   font-size: 13px;
-  transition: background 0.2s;
-}
-.no-results {
-  text-align: center;
-  font-weight: bold;
-  font-size: 14px;
-  margin-top: 12px;
-  padding: 10px;
-  border-radius: 6px;
-  /* color: #007b7f;  */
+  transition: all 0.2s;
 }
 
 .reset-btn:hover {
   background: #f0f0f0;
+  border-color: #666;
 }
 </style>

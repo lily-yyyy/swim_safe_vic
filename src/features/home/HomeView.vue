@@ -113,7 +113,7 @@ const scrollToNextSection = () => {
                 <div class="card-content">
                   <h5 class="card-title">Step 3: Find Free Amenities</h5>
                   <p class="card-description">
-                    Locate free public toilets & water fountains. Provide rating to public toilet to report cleaness.
+                    Locate free public toilets & water fountains. Provide rating to public toilet to report cleanliness.
                   </p>
                   <button class="card-button" @click="goToSwimMap">
                     Rate Public Toilets

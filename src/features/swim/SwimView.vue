@@ -88,7 +88,7 @@ async function handleToiletFeedback(data) {
 
     closeDialog()
   } catch (err) {
-    console.error(' Failed to save toilet feedback:', err)
+    console.error('Failed to save toilet feedback:', err)
     alert('Could not save feedback')
   }
 }
@@ -122,7 +122,7 @@ async function loadLocations() {
       }))
     ]
   } catch (e) {
-    console.error(' Error loading locations:', e)
+    console.error('Error loading locations:', e)
   }
 }
 loadLocations()
@@ -170,7 +170,7 @@ async function handleMarkerClicked(location) {
       selectedToilet.value = enrichedToilet
       selectedLocation.value = null
     } catch (e) {
-      console.error(' Failed to load toilet data:', e)
+      console.error('Failed to load toilet data:', e)
     }
   } else {
     selectedLocation.value = {
@@ -218,7 +218,7 @@ function handleSearchSelected(location) {
 <template>
   <div class="swim-page">
     <div class="map-container">
-      <!--  MAP -->
+      <!-- MAP -->
       <SwimMap
         :filters="selectedFilters"
         :searchQuery="searchQuery"
@@ -226,8 +226,8 @@ function handleSearchSelected(location) {
         @marker-clicked="handleMarkerClicked"
       />
 
-      <!-- 🎛 Sidebar -->
-      <div class="floating-sidebar">
+      <!-- Sidebar (handles its own mobile toggle now) -->
+      <div class="sidebar-wrapper">
         <FilterSidebar
           :results="searchResults"
           @update:filters="handleFilterChange"
@@ -236,17 +236,15 @@ function handleSearchSelected(location) {
         />
       </div>
 
-      <!--  Beach/River Info -->
-      
+      <!-- Beach/River Info -->
       <InfoDialog
-  v-if="selectedLocation && selectedLocation.type !== 'toilet' && !selectedLocation.zoomTo"
-  :location="selectedLocation"
-  @close="closeDialog"
-  @open-planner="() => openPlanner(selectedLocation)"
-/>
+        v-if="selectedLocation && selectedLocation.type !== 'toilet' && !selectedLocation.zoomTo"
+        :location="selectedLocation"
+        @close="closeDialog"
+        @open-planner="() => openPlanner(selectedLocation)"
+      />
 
-
-      <!--  Planner Dialog (prefilled) -->
+      <!-- Planner Dialog (prefilled) -->
       <Planner
         v-if="showPlanner"
         :initialPlaceType="plannerPlaceType"
@@ -254,7 +252,7 @@ function handleSearchSelected(location) {
         @close="showPlanner = false"
       />
 
-      <!--  Toilet Info -->
+      <!-- Toilet Info -->
       <ToiletInfo
         v-if="selectedToilet"
         :toilet="selectedToilet"
@@ -281,54 +279,46 @@ function handleSearchSelected(location) {
   height: 100%;
 }
 
-.floating-sidebar {
-  position: absolute;
-  top: 0; 
-  left: 0;
-  width: 400px;
-  height: 100vh; 
-  background: rgb(255, 255, 255);
-  padding: 16px;
-  padding-top: 96px; 
-  border-radius: 0 8px 8px 0;
-  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-  overflow-y: auto;
-}
-
-/* Scrollbar */
-.floating-sidebar::-webkit-scrollbar {
-  width: 6px;
-}
-
-.floating-sidebar::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-.floating-sidebar::-webkit-scrollbar-thumb {
-  background: #bbb;
-  border-radius: 3px;
-}
-
-.floating-sidebar::-webkit-scrollbar-thumb:hover {
-  background: #888;
-}
-
-@media (max-width: 768px) {
-  .floating-sidebar {
-    position: fixed;
+/* Desktop: Fixed sidebar on the left */
+@media (min-width: 769px) {
+  .sidebar-wrapper {
+    position: absolute;
     top: 0;
+    left: 0;
+    width: 400px;
     height: 100vh;
-    padding-top: 86px;
-    transform: translateX(-100%);
-    border-radius: 0;
-    width: 80%;
-    max-width: 300px;
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+    background: white;
+    padding: 16px;
+    padding-top: 96px;
+    border-radius: 0 8px 8px 0;
+    box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    overflow-y: auto;
   }
 
-  .floating-sidebar.open {
-    transform: translateX(0);
+  .sidebar-wrapper::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .sidebar-wrapper::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+
+  .sidebar-wrapper::-webkit-scrollbar-thumb {
+    background: #bbb;
+    border-radius: 3px;
+  }
+
+  .sidebar-wrapper::-webkit-scrollbar-thumb:hover {
+    background: #888;
+  }
+}
+
+/* Mobile: Sidebar handles its own positioning and toggle */
+@media (max-width: 768px) {
+  .sidebar-wrapper {
+    /* Remove all positioning - FilterSidebar handles it */
+    position: static;
   }
 }
 </style>
